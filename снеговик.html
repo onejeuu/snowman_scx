@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Помощник для игры "Снеговик"</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #2c3e50, #4a6491);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+        }
+        
+        .subtitle {
+            color: #555;
+            font-size: 0.9rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 12px;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .info-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .info-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .info-label {
+            font-size: 0.75rem;
+            color: #666;
+        }
+        
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            gap: 3px;
+            margin-bottom: 15px;
+            background-color: #34495e;
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .cell {
+            width: 52px;
+            height: 52px;
+            background-color: #bdc3c7;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            border: 2px solid #95a5a6;
+            position: relative;
+        }
+        
+        .cell:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+        }
+        
+        .cell.unknown {
+            background-color: #bdc3c7;
+            color: #2c3e50;
+        }
+        
+        .cell.normal {
+            background-color: #ecf0f1;
+            color: #333;
+        }
+        
+        .cell.gold {
+            background-color: #ffd700;
+            color: #b8860b;
+            box-shadow: inset 0 0 10px rgba(184, 134, 11, 0.5);
+        }
+        
+        .cell.empty {
+            background-color: #7f8c8d;
+            color: #ecf0f1;
+        }
+        
+        .cell.possible-gold {
+            background-color: #ffeb3b;
+            color: #b8860b;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 235, 59, 0.7); }
+            70% { box-shadow: 0 0 0 5px rgba(255, 235, 59, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 235, 59, 0); }
+        }
+        
+        .cell.gold-outline {
+            border: 2px solid #ffa500;
+            box-shadow: 0 0 5px rgba(255, 165, 0, 0.7);
+        }
+        
+        .cell-number {
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            font-size: 0.6rem;
+            color: #666;
+        }
+        
+        .gold-chance {
+            position: absolute;
+            bottom: 1px;
+            right: 1px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        .gold-chance.high {
+            color: #b8860b;
+            font-weight: bold;
+        }
+        
+        .gold-chance.low {
+            color: #95a5a6;
+            font-weight: normal;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: #2c3e50;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #34495e;
+        }
+        
+        .btn-outline-mode {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .btn-outline-mode:hover {
+            background-color: #e67e22;
+        }
+        
+        .btn-outline-mode.active {
+            background-color: #d35400;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .instructions {
+            background-color: #f9f9f9;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 5px solid #2c3e50;
+            font-size: 0.85rem;
+        }
+        
+        .instructions h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .instructions ul {
+            padding-left: 15px;
+            margin-bottom: 8px;
+        }
+        
+        .instructions li {
+            margin-bottom: 4px;
+        }
+        
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 8px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.75rem;
+        }
+        
+        .legend-color {
+            width: 18px;
+            height: 18px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .cell {
+                width: 45px;
+                height: 45px;
+                font-size: 1rem;
+            }
+            
+            .btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .cell {
+                width: 38px;
+                height: 38px;
+                font-size: 0.9rem;
+            }
+            
+            .game-info {
+                flex-direction: column;
+                gap: 6px;
+            }
+            
+            .instructions {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Помощник для игры "Снеговик"</h1>
+            <p class="subtitle">Автоматический анализ после каждого действия. Помощник не умеет предсказывать.</p>
+        </header>
+        
+        <div class="game-area">
+            <div class="game-info">
+                <div class="info-item">
+                    <div class="info-value" id="gold-count">0</div>
+                    <div class="info-label">Золотых</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value" id="empty-count">0</div>
+                    <div class="info-label">Пустых</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value" id="possible-gold-count">0</div>
+                    <div class="info-label">Возможных ≥50%</div>
+                </div>
+            </div>
+            
+            <div class="game-board" id="game-board">
+                <!-- Клетки будут созданы с помощью JavaScript -->
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-primary" id="new-game-btn">Новая игра</button>
+                <button class="btn btn-outline-mode" id="outline-mode-btn">Золотые контуры</button>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>Как использовать помощник:</h3>
+            <ul>
+                <li>Нажимайте на клетки, чтобы изменить статус: <strong>Неизвестно → Обычная → Золотая → Неизвестно</strong></li>
+                <li>Кнопка <strong>"Золотые контуры"</strong> переводит в режим установки/снятия золотых контуров</li>
+                <li><strong>Анализ происходит автоматически</strong> после каждого вашего действия</li>
+                <li><strong>Проценты в клетках:</strong> показывают шанс быть золотой ячейкой</li>
+                <li><strong>Желтые клетки:</strong> шанс ≥50%, <strong>серые проценты:</strong> шанс &lt;50%</li>
+            </ul>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #bdc3c7;"></div>
+                    <span>Неизвестная</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ecf0f1;"></div>
+                    <span>Обычная</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ffd700;"></div>
+                    <span>Золотая</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #7f8c8d;"></div>
+                    <span>Пустая</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="border: 2px solid #ffa500; background-color: #ecf0f1;"></div>
+                    <span>Золотой контур</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ffeb3b;"></div>
+                    <span>Шанс ≥50%</span>
+                </div>
+            </div>
+        </div>
+		<p></p>
+		<p class="subtitle">Скрипт для общего пользования и распространения. Сделан CrossCanon</p>
+    </div>
+	
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const rows = 5;
+            const cols = 6;
+            const totalGold = 4;
+            let gameBoard = [];
+            let emptyCells = [];
+            let possibleGoldCells = [];
+            let outlineMode = false;
+            
+            const gameBoardElement = document.getElementById('game-board');
+            const goldCountElement = document.getElementById('gold-count');
+            const emptyCountElement = document.getElementById('empty-count');
+            const possibleGoldCountElement = document.getElementById('possible-gold-count');
+            const newGameBtn = document.getElementById('new-game-btn');
+            const outlineModeBtn = document.getElementById('outline-mode-btn');
+            
+            // Состояния клеток
+            const CELL_STATES = {
+                UNKNOWN: 'unknown',
+                NORMAL: 'normal',
+                GOLD: 'gold',
+                EMPTY: 'empty',
+                POSSIBLE_GOLD: 'possible-gold'
+            };
+            
+            // Инициализация игрового поля
+            function initGameBoard() {
+                gameBoard = [];
+                emptyCells = [];
+                possibleGoldCells = [];
+                outlineMode = false;
+                outlineModeBtn.classList.remove('active');
+                outlineModeBtn.textContent = 'Золотые контуры';
+                
+                // Создаем массив игрового поля 5×6
+                for (let row = 0; row < rows; row++) {
+                    gameBoard[row] = [];
+                    for (let col = 0; col < cols; col++) {
+                        gameBoard[row][col] = {
+                            state: CELL_STATES.UNKNOWN,
+                            hasGoldOutline: false,
+                            goldChance: 0,
+                            row: row,
+                            col: col
+                        };
+                    }
+                }
+                
+                // Обновляем отображение
+                renderGameBoard();
+                updateCounters();
+            }
+            
+            // Проверка валидности клетки
+            function isValidCell(row, col) {
+                return row >= 0 && row < rows && col >= 0 && col < cols;
+            }
+            
+            // Получение соседних клеток (только по вертикали/горизонтали)
+            function getAdjacentCells(row, col) {
+                const neighbors = [];
+                
+                // Вверх
+                if (row > 0) neighbors.push({row: row-1, col});
+                // Вниз
+                if (row < rows-1) neighbors.push({row: row+1, col});
+                // Влево
+                if (col > 0) neighbors.push({row, col: col-1});
+                // Вправо
+                if (col < cols-1) neighbors.push({row, col: col+1});
+                
+                return neighbors;
+            }
+            
+            // Отрисовка игрового поля
+            function renderGameBoard() {
+                gameBoardElement.innerHTML = '';
+                
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const cell = gameBoard[row][col];
+                        const cellElement = document.createElement('div');
+                        
+                        // Определяем класс клетки на основе состояния и шанса
+                        let cellClass = `cell ${cell.state}`;
+                        
+                        // Если клетка помечена как пустая
+                        const isEmpty = emptyCells.some(emptyCell => 
+                            emptyCell.row === row && emptyCell.col === col);
+                        
+                        // Если клетка помечена как возможная золотая с шансом >= 50%
+                        const isPossibleGold = possibleGoldCells.some(goldCell => 
+                            goldCell.row === row && goldCell.col === col && 
+                            goldCell.chance >= 50);
+                        
+                        // Приоритеты отображения: Золотая > Пустая > Возможная золотая > Обычная > Неизвестная
+                        if (cell.state === CELL_STATES.GOLD) {
+                            cellClass = `cell ${CELL_STATES.GOLD}`;
+                        } else if (isEmpty && cell.state === CELL_STATES.UNKNOWN) {
+                            cellClass = `cell ${CELL_STATES.EMPTY}`;
+                        } else if (isPossibleGold && cell.state === CELL_STATES.UNKNOWN) {
+                            cellClass = `cell ${CELL_STATES.POSSIBLE_GOLD}`;
+                        } else if (cell.state === CELL_STATES.NORMAL) {
+                            cellClass = `cell ${CELL_STATES.NORMAL}`;
+                        } else {
+                            cellClass = `cell ${CELL_STATES.UNKNOWN}`;
+                        }
+                        
+                        cellElement.className = cellClass;
+                        
+                        // Добавляем номер клетки (координаты)
+                        const cellNumber = document.createElement('div');
+                        cellNumber.className = 'cell-number';
+                        cellNumber.textContent = `${row+1},${col+1}`;
+                        cellElement.appendChild(cellNumber);
+                        
+                        // Добавляем золотой контур если есть
+                        if (cell.hasGoldOutline) {
+                            cellElement.classList.add('gold-outline');
+                        }
+                        
+                        // Добавляем символ для золотых клеток
+                        if (cell.state === CELL_STATES.GOLD) {
+                            cellElement.textContent = '★';
+                        }
+                        
+                        // Показываем шанс для ВСЕХ клеток с контурами и их соседей
+                        // Если клетка имеет шанс > 0 (соседствует с контуром) и она неизвестна
+                        if (cell.goldChance > 0 && cell.state === CELL_STATES.UNKNOWN) {
+                            const chanceElement = document.createElement('div');
+                            chanceElement.className = 'gold-chance';
+                            
+                            // Определяем класс для стилизации процента
+                            if (cell.goldChance >= 50) {
+                                chanceElement.classList.add('high');
+                            } else {
+                                chanceElement.classList.add('low');
+                            }
+                            
+                            chanceElement.textContent = `${Math.round(cell.goldChance)}%`;
+                            cellElement.appendChild(chanceElement);
+                        }
+                        
+                        // Добавляем обработчик клика
+                        cellElement.addEventListener('click', () => handleCellClick(row, col));
+                        
+                        gameBoardElement.appendChild(cellElement);
+                    }
+                }
+            }
+            
+            // Обработка клика по клетке
+            function handleCellClick(row, col) {
+                const cell = gameBoard[row][col];
+                
+                // Если включен режим установки золотых контуров
+                if (outlineMode) {
+                    // Переключаем состояние золотого контура
+                    cell.hasGoldOutline = !cell.hasGoldOutline;
+                } else {
+                    // Циклическое изменение состояния клетки
+                    if (cell.state === CELL_STATES.UNKNOWN) {
+                        cell.state = CELL_STATES.NORMAL;
+                    } else if (cell.state === CELL_STATES.NORMAL) {
+                        cell.state = CELL_STATES.GOLD;
+                    } else {
+                        cell.state = CELL_STATES.UNKNOWN;
+                    }
+                }
+                
+                // Автоматически запускаем анализ после каждого действия
+                analyzeBoard();
+                
+                // Обновляем отображение
+                renderGameBoard();
+                updateCounters();
+            }
+            
+            // Анализ поля для определения пустых и возможных золотых ячеек
+            function analyzeBoard() {
+                // Сбрасываем предыдущие результаты
+                emptyCells = [];
+                possibleGoldCells = [];
+                
+                // Сбрасываем шансы для всех клеток
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        gameBoard[row][col].goldChance = 0;
+                    }
+                }
+                
+                // Шаг 1: Правило - Если ячейка раскрыта (обычная) и не имеет золотого контура
+                // все её соседи становятся пустыми
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const cell = gameBoard[row][col];
+                        
+                        if (cell.state === CELL_STATES.NORMAL && !cell.hasGoldOutline) {
+                            const neighbors = getAdjacentCells(row, col);
+                            
+                            neighbors.forEach(neighbor => {
+                                const neighborCell = gameBoard[neighbor.row][neighbor.col];
+                                
+                                // Сосед становится пустым, если он неизвестен
+                                if (neighborCell.state === CELL_STATES.UNKNOWN) {
+                                    // Проверяем, нет ли уже этой клетки в emptyCells
+                                    if (!emptyCells.some(c => c.row === neighbor.row && c.col === neighbor.col)) {
+                                        emptyCells.push({row: neighbor.row, col: neighbor.col});
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+                
+                // Шаг 2: Собираем все клетки с золотыми контурами
+                const outlineCells = [];
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        if (gameBoard[row][col].hasGoldOutline) {
+                            outlineCells.push({row, col});
+                        }
+                    }
+                }
+                
+                // Шаг 3: Для каждой клетки с контуром анализируем её соседей
+                // Золотой контур делает соседей возможными для золотых ячеек (базовый шанс 25%)
+                const goldChanceMap = new Map();
+                
+                outlineCells.forEach(outlineCell => {
+                    const {row, col} = outlineCell;
+                    const neighbors = getAdjacentCells(row, col);
+                    
+                    neighbors.forEach(neighbor => {
+                        const neighborCell = gameBoard[neighbor.row][neighbor.col];
+                        
+                        // Клетка может быть золотой, если она неизвестна или уже помечена как золотая
+                        if (neighborCell.state === CELL_STATES.UNKNOWN || neighborCell.state === CELL_STATES.GOLD) {
+                            const key = `${neighbor.row},${neighbor.col}`;
+                            
+                            // Базовый шанс от одного контура - 25%
+                            let currentChance = 25;
+                            
+                            if (goldChanceMap.has(key)) {
+                                // Если клетка уже в карте, увеличиваем шанс
+                                currentChance = goldChanceMap.get(key).chance;
+                                currentChance += 25; // Каждый дополнительный контур добавляет 25%
+                            }
+                            
+                            goldChanceMap.set(key, {
+                                row: neighbor.row,
+                                col: neighbor.col,
+                                chance: currentChance
+                            });
+                        }
+                    });
+                });
+                
+                // Шаг 4: Анализируем клетки между двумя контурами (повышаем шанс)
+                // Если две клетки с контурами находятся рядом (по горизонтали или вертикали)
+                // то клетка между ними имеет повышенный шанс быть золотой
+                for (let i = 0; i < outlineCells.length; i++) {
+                    for (let j = i + 1; j < outlineCells.length; j++) {
+                        const cell1 = outlineCells[i];
+                        const cell2 = outlineCells[j];
+                        
+                        // Проверяем, находятся ли клетки рядом по горизонтали
+                        if (cell1.row === cell2.row && Math.abs(cell1.col - cell2.col) === 2) {
+                            // Между ними есть одна клетка
+                            const middleCol = Math.min(cell1.col, cell2.col) + 1;
+                            const middleRow = cell1.row;
+                            
+                            if (isValidCell(middleRow, middleCol) && 
+                                gameBoard[middleRow][middleCol].state === CELL_STATES.UNKNOWN) {
+                                const key = `${middleRow},${middleCol}`;
+                                let currentChance = goldChanceMap.has(key) ? goldChanceMap.get(key).chance : 0;
+                                // Клетка между двумя контурами получает +50% к шансу
+                                goldChanceMap.set(key, {
+                                    row: middleRow,
+                                    col: middleCol,
+                                    chance: currentChance + 50
+                                });
+                            }
+                        }
+                        
+                        // Проверяем, находятся ли клетки рядом по вертикали
+                        if (cell1.col === cell2.col && Math.abs(cell1.row - cell2.row) === 2) {
+                            // Между ними есть одна клетка
+                            const middleRow = Math.min(cell1.row, cell2.row) + 1;
+                            const middleCol = cell1.col;
+                            
+                            if (isValidCell(middleRow, middleCol) && 
+                                gameBoard[middleRow][middleCol].state === CELL_STATES.UNKNOWN) {
+                                const key = `${middleRow},${middleCol}`;
+                                let currentChance = goldChanceMap.has(key) ? goldChanceMap.get(key).chance : 0;
+                                // Клетка между двумя контурами получает +50% к шансу
+                                goldChanceMap.set(key, {
+                                    row: middleRow,
+                                    col: middleCol,
+                                    chance: currentChance + 50
+                                });
+                            }
+                        }
+                        
+                        // Проверяем, являются ли клетки соседями (шанс, что обе золотые)
+                        if (Math.abs(cell1.row - cell2.row) + Math.abs(cell1.col - cell2.col) === 1) {
+                            // Два контура рядом - каждая из них может быть золотой
+                            // Увеличиваем шанс для обеих клеток
+                            const key1 = `${cell1.row},${cell1.col}`;
+                            const key2 = `${cell2.row},${cell2.col}`;
+                            
+                            if (isValidCell(cell1.row, cell1.col) && 
+                                gameBoard[cell1.row][cell1.col].state === CELL_STATES.UNKNOWN) {
+                                let chance1 = goldChanceMap.has(key1) ? goldChanceMap.get(key1).chance : 0;
+                                // Контуры рядом получают +30% к шансу быть золотыми
+                                goldChanceMap.set(key1, {
+                                    row: cell1.row,
+                                    col: cell1.col,
+                                    chance: chance1 + 30
+                                });
+                            }
+                            
+                            if (isValidCell(cell2.row, cell2.col) && 
+                                gameBoard[cell2.row][cell2.col].state === CELL_STATES.UNKNOWN) {
+                                let chance2 = goldChanceMap.has(key2) ? goldChanceMap.get(key2).chance : 0;
+                                // Контуры рядом получают +30% к шансу быть золотыми
+                                goldChanceMap.set(key2, {
+                                    row: cell2.row,
+                                    col: cell2.col,
+                                    chance: chance2 + 30
+                                });
+                            }
+                        }
+                    }
+                }
+                
+                // Шаг 5: Обновляем шансы в gameBoard и добавляем в possibleGoldCells если шанс >= 50%
+                goldChanceMap.forEach((value, key) => {
+                    const {row, col, chance} = value;
+                    
+                    // Ограничиваем шанс 100%
+                    const finalChance = Math.min(chance, 100);
+                    
+                    // Обновляем шанс в gameBoard
+                    gameBoard[row][col].goldChance = finalChance;
+                    
+                    // Добавляем в possibleGoldCells если шанс >= 50% и клетка неизвестна
+                    if (finalChance >= 50 && gameBoard[row][col].state === CELL_STATES.UNKNOWN) {
+                        possibleGoldCells.push({row, col, chance: finalChance});
+                    }
+                });
+                
+                // Шаг 6: Учитываем уже найденные золотые ячейки
+                // Если клетка уже помечена как золотая, её соседи с контурами должны быть пустыми
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        if (gameBoard[row][col].state === CELL_STATES.GOLD) {
+                            const neighbors = getAdjacentCells(row, col);
+                            
+                            neighbors.forEach(neighbor => {
+                                // Если сосед имеет золотой контур и неизвестен, он должен быть пустым
+                                if (isValidCell(neighbor.row, neighbor.col) &&
+                                    gameBoard[neighbor.row][neighbor.col].hasGoldOutline &&
+                                    gameBoard[neighbor.row][neighbor.col].state === CELL_STATES.UNKNOWN) {
+                                    
+                                    if (!emptyCells.some(c => c.row === neighbor.row && c.col === neighbor.col)) {
+                                        emptyCells.push({row: neighbor.row, col: neighbor.col});
+                                    }
+                                    
+                                    // Удаляем из possibleGoldCells если там есть
+                                    const index = possibleGoldCells.findIndex(c => 
+                                        c.row === neighbor.row && c.col === neighbor.col);
+                                    if (index !== -1) {
+                                        possibleGoldCells.splice(index, 1);
+                                    }
+                                    
+                                    // Обнуляем шанс для этой клетки
+                                    gameBoard[neighbor.row][neighbor.col].goldChance = 0;
+                                }
+                            });
+                        }
+                    }
+                }
+                
+                // Шаг 7: Клетки с золотым контуром не могут быть золотыми
+                // Помечаем их как пустые если они неизвестны и обнуляем их шанс
+                outlineCells.forEach(cell => {
+                    if (gameBoard[cell.row][cell.col].state === CELL_STATES.UNKNOWN) {
+                        if (!emptyCells.some(c => c.row === cell.row && c.col === cell.col)) {
+                            emptyCells.push({row: cell.row, col: cell.col});
+                        }
+                        
+                        // Удаляем из possibleGoldCells если там есть
+                        const index = possibleGoldCells.findIndex(c => 
+                            c.row === cell.row && c.col === cell.col);
+                        if (index !== -1) {
+                            possibleGoldCells.splice(index, 1);
+                        }
+                        
+                        // Обнуляем шанс для клеток с контурами
+                        gameBoard[cell.row][cell.col].goldChance = 0;
+                    }
+                });
+                
+                // Шаг 8: Обновляем счетчики
+                updateCounters();
+            }
+            
+            // Обновление счетчиков
+            function updateCounters() {
+                let goldCount = 0;
+                
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        if (gameBoard[row][col].state === CELL_STATES.GOLD) {
+                            goldCount++;
+                        }
+                    }
+                }
+                
+                goldCountElement.textContent = goldCount;
+                emptyCountElement.textContent = emptyCells.length;
+                possibleGoldCountElement.textContent = possibleGoldCells.length;
+            }
+            
+            // Переключение режима установки золотых контуров
+            function toggleOutlineMode() {
+                outlineMode = !outlineMode;
+                
+                if (outlineMode) {
+                    outlineModeBtn.classList.add('active');
+                    outlineModeBtn.textContent = 'Режим контуров (вкл)';
+                } else {
+                    outlineModeBtn.classList.remove('active');
+                    outlineModeBtn.textContent = 'Золотые контуры';
+                }
+            }
+            
+            // Назначение обработчиков событий
+            newGameBtn.addEventListener('click', initGameBoard);
+            outlineModeBtn.addEventListener('click', toggleOutlineMode);
+            
+            // Инициализация игры при загрузке
+            initGameBoard();
+            
+            // Запускаем начальный анализ
+            analyzeBoard();
+        });
+    </script>
+</body>
+</html>

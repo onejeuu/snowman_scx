@@ -56,6 +56,21 @@
             margin-bottom: 20px;
         }
         
+        /* Верхняя панель с управлением */
+        .top-controls {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 15px;
+        }
+        
+        .export-import {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Игровая информация */
         .game-info {
             display: flex;
             justify-content: space-between;
@@ -70,7 +85,7 @@
         
         .info-item {
             text-align: center;
-            flex: 2;
+            flex: 1;
         }
         
         .info-value {
@@ -84,6 +99,7 @@
             color: #666;
         }
         
+        /* Игровое поле */
         .game-board {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
@@ -156,6 +172,105 @@
             box-shadow: 0 0 5px rgba(255, 165, 0, 0.7);
         }
         
+        /* Подсказка следующего хода */
+        .cell.next-move-hint {
+            animation: nextMovePulse 1.5s infinite;
+            border: 3px solid #27ae60;
+            box-shadow: 0 0 15px rgba(39, 174, 96, 0.7);
+            z-index: 10;
+        }
+        
+        @keyframes nextMovePulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(39, 174, 96, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(39, 174, 96, 0); }
+        }
+        
+        /* Нижняя панель с кнопками */
+        .bottom-controls {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 20px;
+        }
+        
+        .left-controls, .right-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+        }
+        
+        .btn-primary {
+            background-color: #2c3e50;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #34495e;
+        }
+		
+		.btn-secondary {
+            background-color: #bfbfbf;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #adabab;
+        }
+        
+        .btn-outline-mode {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .btn-outline-mode:hover {
+            background-color: #e67e22;
+        }
+        
+        .btn-outline-mode.active {
+            background-color: #d35400;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-next-move {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .btn-next-move:hover {
+            background-color: #2ecc71;
+        }
+        
+        .btn-next-move.active {
+            background-color: #1e8449;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-icon {
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+        
+        .btn-with-text {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+        
         .cell-number {
             position: absolute;
             top: 2px;
@@ -182,48 +297,7 @@
             font-weight: normal;
         }
         
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .btn-primary {
-            background-color: #2c3e50;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: #34495e;
-        }
-        
-        .btn-outline-mode {
-            background-color: #f39c12;
-            color: white;
-        }
-        
-        .btn-outline-mode:hover {
-            background-color: #e67e22;
-        }
-        
-        .btn-outline-mode.active {
-            background-color: #d35400;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
-        }
-        
+        /* Инструкции */
         .instructions {
             background-color: #f9f9f9;
             padding: 15px;
@@ -270,7 +344,7 @@
             border: 1px solid #ccc;
         }
         
-        /* Секция с тактиками */
+        /* Тактики */
         .tactics-section {
             margin-bottom: 20px;
         }
@@ -376,24 +450,24 @@
         }
         
         .preview-cell {
-			aspect-ratio: 1 / 1;
-			flex: 1 0 auto; 
-			border-radius: 2px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			font-size: 0.7rem;
-			font-weight: bold;
-			overflow: hidden;
-		}
+            aspect-ratio: 1 / 1;
+            flex: 1 0 auto; 
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            overflow: hidden;
+        }
         
         .tactic-description {
             font-size: 0.85rem;
             color: #555;
             line-height: 1.4;
             margin-top: 8px;
-			max-height: 60px;
-			overflow: hidden;
+            max-height: 60px;
+            overflow: hidden;
         }
         
         /* Модальное окно */
@@ -590,6 +664,119 @@
             border: 1px solid #d1e3ff;
         }
         
+        /* Экспорт/Импорт */
+        .export-import-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            display: none;
+        }
+        
+        .export-import-modal.active {
+            display: block;
+        }
+        
+        .export-import-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .export-import-overlay.active {
+            display: block;
+        }
+        
+		.code-container {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			background-color: #2c3e50;
+			border-radius: 6px;
+			padding: 12px;
+			margin: 10px 0;
+		}
+		
+		.code-content {
+			flex: 1;
+			color: #ecf0f1;
+			font-family: 'Courier New', monospace;
+			padding: 8px;
+			overflow-x: auto;
+			background-color: rgba(0, 0, 0, 0.2);
+			border-radius: 4px;
+			min-height: 40px;
+			display: flex;
+			align-items: center;
+		}
+        
+		.copy-btn {
+			background-color: #3498db;
+			color: white;
+			border: none;
+			border-radius: 4px;
+			padding: 8px 16px;
+			cursor: pointer;
+			font-size: 0.9rem;
+			white-space: nowrap;
+			transition: background-color 0.3s;
+		}
+        
+		.copy-btn:hover {
+			background-color: #2980b9;
+		}
+			
+		.copy-btn.copied {
+			background-color: #27ae60;
+		}
+        
+        .import-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #bdc3c7;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+        
+        .import-input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .import-status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .import-status.success {
+            background-color: #d5edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .import-status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
         .author-note {
             text-align: center;
             color: #7f8c8d;
@@ -615,8 +802,7 @@
             }
             
             .btn {
-                padding: 8px 16px;
-                font-size: 0.85rem;
+                padding: 10px 15px;
             }
             
             .tactics-grid {
@@ -624,7 +810,7 @@
             }
             
             .modal {
-                max-width: 90%;
+                max-width: 95%;
                 padding: 20px;
             }
             
@@ -644,13 +830,13 @@
             .game-info {
                 flex-direction: row;
                 gap: 6px;
-				padding: 8px 10px;
+                padding: 8px 10px;
             }
-			
-			.info-item {
-				flex: 0 0 auto; 
-				min-width: 70px;
-			}
+            
+            .info-item {
+                flex: 0 0 auto; 
+                min-width: 70px;
+            }
             
             .instructions {
                 padding: 12px;
@@ -660,6 +846,10 @@
                 width: 240px;
                 height: 200px;
             }
+            
+            .btn {
+                padding: 8px 12px;
+            }
         }
     </style>
 </head>
@@ -668,10 +858,11 @@
         <header>
             <h1>Помощник для игры "Снеговик"</h1>
             <p class="subtitle">Автоматический анализ после каждого действия. Помощник не умеет предсказывать.</p>
-            <p class="subtitle">Используйте тактики ниже для максимальной эффективности!</p>
+            <p class="subtitle">Используйте тактики для максимальной эффективности!</p>
         </header>
         
-        <div class="game-area">
+        <div class="game-area">  
+            <!-- Игровая информация -->
             <div class="game-info">
                 <div class="info-item">
                     <div class="info-value" id="gold-count">0</div>
@@ -685,26 +876,54 @@
                     <div class="info-value" id="possible-gold-count">0</div>
                     <div class="info-label">Возможных ≥50%</div>
                 </div>
+                <div class="info-item">
+                    <div class="info-value" id="next-move-cell">--</div>
+                    <div class="info-label">Следующий ход</div>
+                </div>
+            </div>
+			
+			<!-- Верхняя панель с экспортом/импортом -->
+            <div class="top-controls">
+                <div class="export-import">
+                    <button class="btn btn-secondary" id="export-btn" title="Экспорт/Импорт поля">
+                        Экспорт / Импорт
+                    </button>
+                </div>
             </div>
             
+            <!-- Игровое поле -->
             <div class="game-board" id="game-board">
                 <!-- Клетки будут созданы с помощью JavaScript -->
             </div>
             
-            <div class="controls">
-                <button class="btn btn-primary" id="new-game-btn">Новая игра</button>
-                <button class="btn btn-outline-mode" id="outline-mode-btn">Золотые контуры</button>
+            <!-- Нижняя панель с кнопками управления -->
+            <div class="bottom-controls">
+                <div class="left-controls">
+                    <button class="btn btn-primary btn-with-text" id="new-game-btn">
+                        Новая игра
+                    </button>
+                </div>
+                <div class="right-controls">
+                    <button class="btn btn-outline-mode btn-with-text" id="outline-mode-btn">
+                        Золотые контуры
+                    </button>
+                    <button class="btn btn-next-move" id="next-move-btn" title="Подсказка хода">
+                        💡
+                    </button>
+                </div>
             </div>
         </div>
         
+        <!-- Инструкции -->
         <div class="instructions">
             <h3>Как использовать помощник:</h3>
             <ul>
                 <li>Нажимайте на клетки, чтобы изменить статус: <strong>Неизвестно → Обычная → Золотая → Неизвестно</strong></li>
-                <li>Кнопка <strong>"Золотые контуры"</strong> переводит в режим установки/снятия золотых контуров</li>
+                <li><strong>Кнопка "Золотые контуры":</strong> режим установки/снятия золотых контуров</li>
+                <li><strong>Кнопка "💡":</strong> показывает лучший следующий ход (включается/выключается)</li>
+                <li><strong>Кнопки "📤" и "📥":</strong> экспорт и импорт расстановки поля</li>
+                <li><strong>Проценты в клетках:</strong> шанс быть золотой ячейкой</li>
                 <li><strong>Анализ происходит автоматически</strong> после каждого вашего действия</li>
-                <li><strong>Проценты в клетках:</strong> показывают шанс быть золотой ячейкой</li>
-                <li><strong>Желтые клетки:</strong> шанс ≥50%, <strong>серые проценты:</strong> шанс &lt;50%</li>
             </ul>
             
             <div class="legend">
@@ -729,8 +948,8 @@
                     <span>Золотой контур</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background-color: #ffeb3b;"></div>
-                    <span>Шанс ≥50%</span>
+                    <div class="legend-color" style="background-color: #27ae60; border: 2px solid #2c3e50;"></div>
+                    <span>Следующий ход</span>
                 </div>
             </div>
         </div>
@@ -802,11 +1021,16 @@
                 </div>
             </div>
         </div>
-        <p class="author-note"><a href="https://github.com/CrossCanon/snowman_scx" target="_blank" rel="noopener noreferrer">GitHub</a> / <a href="https://vk.com/crosscanon" target="_blank" rel="noopener noreferrer">VK</a></p>
+        <p class="author-note">
+		<a href="https://github.com/CrossCanon/snowman_scx" target="_blank" rel="noopener noreferrer">GitHub</a> / 
+		<a href="https://vk.com/crosscanon" target="_blank" rel="noopener noreferrer">VK</a> /
+		<a href="https://www.donationalerts.com/r/crosscanon" target="_blank" rel="noopener noreferrer">Donation
+		</a>
+		</p>
         <p class="author-note">Скрипт для общего пользования и распространения. Сделан CrossCanon</p>
     </div>
     
-    <!-- Модальные окна для тактик -->
+    <!-- Модальное окно для тактик -->
     <div class="modal-overlay" id="modal-overlay">
         <div class="modal">
             <div class="modal-header">
@@ -821,6 +1045,32 @@
             </div>
         </div>
     </div>
+    
+    <!-- Модальное окно для экспорта/импорта -->
+	<div class="export-import-modal" id="export-import-modal">
+		<div class="modal-header">
+			<h3 class="modal-title">Экспорт / Импорт поля</h3>
+			<button class="close-modal" id="close-export-modal">&times;</button>
+		</div>
+		<div class="modal-content">
+			<div id="export-container">
+				<p>Скопируйте этот код для сохранения текущей расстановки:</p>
+				<div class="code-container">
+					<div class="code-content">
+						<code id="export-code"></code>
+					</div>
+					<button class="copy-btn" id="copy-btn">Копировать</button>
+				</div>
+				<p><small>Формат: A1g,B2o,C3u где g=gold, o=outline, u=unknown, n=normal, e=empty</small></p>
+			</div>
+			<div id="import-container">
+				<p>Вставьте код для загрузки расстановки:</p>
+				<input type="text" class="import-input" id="import-input" placeholder="A1g,B2o,C3u...">
+				<button class="btn btn-primary" id="load-btn">Загрузить</button>
+				<div class="import-status" id="import-status"></div>
+			</div>
+		</div>
+	</div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -831,13 +1081,34 @@
             let emptyCells = [];
             let possibleGoldCells = [];
             let outlineMode = false;
+            let nextMoveMode = false;
+            let nextMoveHintCell = null;
+            
+            // Алмазная формация - оптимальный старт
+            const DIAMOND_FORMATION = [
+                {row: 1, col: 1}, // (2,2)
+                {row: 1, col: 4}, // (2,5)
+                {row: 3, col: 1}, // (4,2)
+                {row: 3, col: 4}  // (4,5)
+            ];
             
             const gameBoardElement = document.getElementById('game-board');
             const goldCountElement = document.getElementById('gold-count');
             const emptyCountElement = document.getElementById('empty-count');
             const possibleGoldCountElement = document.getElementById('possible-gold-count');
+            const nextMoveCellElement = document.getElementById('next-move-cell');
             const newGameBtn = document.getElementById('new-game-btn');
             const outlineModeBtn = document.getElementById('outline-mode-btn');
+            const nextMoveBtn = document.getElementById('next-move-btn');
+            const exportBtn = document.getElementById('export-btn');
+            const exportImportModal = document.getElementById('export-import-modal');
+            const exportImportOverlay = document.getElementById('export-import-overlay');
+            const exportCodeElement = document.getElementById('export-code');
+            const copyBtn = document.getElementById('copy-btn');
+            const importInput = document.getElementById('import-input');
+            const loadBtn = document.getElementById('load-btn');
+            const importStatus = document.getElementById('import-status');
+            const closeExportModal = document.getElementById('close-export-modal');
             
             // Элементы модального окна
             const modalOverlay = document.getElementById('modal-overlay');
@@ -855,14 +1126,34 @@
                 POSSIBLE_GOLD: 'possible-gold'
             };
             
+            // Коды для экспорта
+            const CELL_CODES = {
+                'unknown': 'u',
+                'normal': 'n',
+                'gold': 'g',
+                'empty': 'e',
+                'outline': 'o'
+            };
+            
+            const CODE_CELLS = {
+                'u': CELL_STATES.UNKNOWN,
+                'n': CELL_STATES.NORMAL,
+                'g': CELL_STATES.GOLD,
+                'e': CELL_STATES.EMPTY,
+                'o': CELL_STATES.UNKNOWN
+            };
+            
             // Инициализация игрового поля
             function initGameBoard() {
                 gameBoard = [];
                 emptyCells = [];
                 possibleGoldCells = [];
                 outlineMode = false;
+                nextMoveMode = false;
+                nextMoveHintCell = null;
+                
                 outlineModeBtn.classList.remove('active');
-                outlineModeBtn.textContent = 'Золотые контуры';
+                nextMoveBtn.classList.remove('active');
                 
                 // Создаем массив игрового поля 5×6
                 for (let row = 0; row < rows; row++) {
@@ -873,7 +1164,9 @@
                             hasGoldOutline: false,
                             goldChance: 0,
                             row: row,
-                            col: col
+                            col: col,
+                            isRecommended: false,
+                            infoValue: 0
                         };
                     }
                 }
@@ -881,6 +1174,7 @@
                 // Обновляем отображение
                 renderGameBoard();
                 updateCounters();
+                updateNextMoveHint();
                 
                 // Инициализируем предпросмотры тактик
                 initTacticPreviews();
@@ -889,38 +1183,471 @@
                 setupTacticCards();
             }
             
-            // Настройка обработчиков для карточек тактик
-            function setupTacticCards() {
-                document.querySelectorAll('.tactic-card').forEach(card => {
-                    card.addEventListener('click', function() {
-                        const tactic = this.getAttribute('data-tactic');
-                        openTacticModal(tactic);
-                    });
-                });
+            // УЛУЧШЕННАЯ ФУНКЦИЯ ПОДСКАЗКИ С РАЦИОНАЛЬНОЙ ЛОГИКОЙ
+            function calculateNextMove() {
+                let bestCell = null;
+                let bestScore = -Infinity;
+                
+                // Сбрасываем все флаги
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        gameBoard[row][col].isRecommended = false;
+                        gameBoard[row][col].infoValue = 0;
+                    }
+                }
+				
+				// ПРИОРИТЕТ 1: Клетки между двумя контурами (потенциальная триангуляция)
+				for (let row = 0; row < rows; row++) {
+					for (let col = 0; col < cols; col++) {
+						const cell = gameBoard[row][col];
+						if (cell.state !== CELL_STATES.UNKNOWN) continue;
+						if (emptyCells.some(ec => ec.row === row && ec.col === col)) continue;
+						
+						// Проверяем, сколько контуров вокруг
+						const neighbors = getAdjacentCells(row, col);
+						let outlineCount = 0;
+						
+						neighbors.forEach(neighbor => {
+							if (gameBoard[neighbor.row][neighbor.col].hasGoldOutline) {
+								outlineCount++;
+							}
+						});
+						
+						if (outlineCount >= 2) {
+							// Это клетка между контурами - ВЫСОКИЙ ПРИОРИТЕТ
+							const score = 150 + calculateInformationValue(row, col);
+							if (score > bestScore) {
+								bestScore = score;
+								bestCell = {row, col, score};
+							}
+						}
+					}
+				}
+				
+				// ШАГ 0: ПРОВЕРКА НА ПРИНУДИТЕЛЬНОЕ ЗОЛОТО
+				// Ищем клетки, которые ДОЛЖНЫ быть золотыми по логике
+				const outlineCells = [];
+				for (let row = 0; row < rows; row++) {
+					for (let col = 0; col < cols; col++) {
+						if (gameBoard[row][col].hasGoldOutline) {
+							outlineCells.push({row, col});
+						}
+					}
+				}
+
+				for (const outline of outlineCells) {
+					const neighbors = getAdjacentCells(outline.row, outline.col);
+					
+					let goldCount = 0;
+					let unknownNeighbors = [];
+					
+					neighbors.forEach(neighbor => {
+						const cell = gameBoard[neighbor.row][neighbor.col];
+						if (cell.state === CELL_STATES.GOLD) {
+							goldCount++;
+						} else if (cell.state === CELL_STATES.UNKNOWN && 
+								  !emptyCells.some(ec => ec.row === neighbor.row && ec.col === neighbor.col)) {
+							unknownNeighbors.push(neighbor);
+						}
+					});
+					
+					// Если у контура еще не найдено золото и остался только один неизвестный сосед
+					if (goldCount === 0 && unknownNeighbors.length === 1) {
+						const forcedGold = unknownNeighbors[0];
+						// Это клетка ДОЛЖНА быть золотой - максимальный приоритет
+						bestCell = {row: forcedGold.row, col: forcedGold.col, score: 200};
+						return bestCell;
+					}
+				}
+                
+                // ШАГ 1: ПРОВЕРКА НА НАЧАЛО ИГРЫ
+                const unknownCount = countUnknownCells();
+                if (unknownCount === rows * cols) {
+                    // Самая первая игра - предлагаем первую клетку алмазной формации
+                    bestCell = {row: DIAMOND_FORMATION[0].row, col: DIAMOND_FORMATION[0].col, score: 100};
+                    return bestCell;
+                }
+                
+                // ШАГ 2: ЕСТЬ ЛИ НЕЗАВЕРШЕННАЯ АЛМАЗНАЯ ФОРМАЦИЯ?
+                let unfinishedDiamondCells = [];
+                for (const pos of DIAMOND_FORMATION) {
+                    const cell = gameBoard[pos.row][pos.col];
+                    if (cell.state === CELL_STATES.UNKNOWN && 
+                        !emptyCells.some(ec => ec.row === pos.row && ec.col === pos.col)) {
+                        unfinishedDiamondCells.push(pos);
+                    }
+                }
+                
+                // Если есть незавершенные клетки алмазной формации, продолжаем её
+                if (unfinishedDiamondCells.length > 0) {
+                    // Выбираем клетку с максимальной информационной ценностью
+                    let bestDiamondCell = null;
+                    let bestDiamondScore = -Infinity;
+                    
+                    for (const pos of unfinishedDiamondCells) {
+                        const score = calculateInformationValue(pos.row, pos.col);
+                        if (score > bestDiamondScore) {
+                            bestDiamondScore = score;
+                            bestDiamondCell = pos;
+                        }
+                    }
+                    
+                    if (bestDiamondCell) {
+                        bestCell = {row: bestDiamondCell.row, col: bestDiamondCell.col, score: 80 + bestDiamondScore};
+                    }
+                }
+                
+                // ШАГ 3: ЕСЛИ НЕТ АЛМАЗНОЙ ФОРМАЦИИ, ИЩЕМ КЛЕТКИ С КОНТУРАМИ
+                if (!bestCell) {
+                    const outlineCells = [];
+                    for (let row = 0; row < rows; row++) {
+                        for (let col = 0; col < cols; col++) {
+                            if (gameBoard[row][col].hasGoldOutline) {
+                                outlineCells.push({row, col});
+                            }
+                        }
+                    }
+                    
+                    // Проверяем контуры на наличие неоткрытых соседей
+                    for (const outline of outlineCells) {
+                        const neighbors = getAdjacentCells(outline.row, outline.col);
+                        let unknownNeighbors = [];
+                        
+                        neighbors.forEach(neighbor => {
+                            const cell = gameBoard[neighbor.row][neighbor.col];
+                            if (cell.state === CELL_STATES.UNKNOWN && 
+                                !emptyCells.some(ec => ec.row === neighbor.row && ec.col === neighbor.col)) {
+                                unknownNeighbors.push(neighbor);
+                            }
+                        });
+                        
+                        // Если у контура есть неоткрытые соседи
+                        if (unknownNeighbors.length > 0) {
+                            // Проверяем, сколько золота уже найдено у этого контура
+                            let goldCount = 0;
+                            neighbors.forEach(neighbor => {
+                                if (gameBoard[neighbor.row][neighbor.col].state === CELL_STATES.GOLD) {
+                                    goldCount++;
+                                }
+                            });
+                            
+                            // Если у контура уже есть золото, приоритет НИЗКИЙ
+                            if (goldCount > 0) {
+                                // Продолжаем поиск более ценных клеток
+                                continue;
+                            } else {
+                                // Если золота нет, выбираем соседа с максимальной информационной ценностью
+                                let bestNeighbor = null;
+                                let bestNeighborScore = -Infinity;
+                                
+                                for (const neighbor of unknownNeighbors) {
+                                    const score = calculateInformationValue(neighbor.row, neighbor.col);
+                                    if (score > bestNeighborScore) {
+                                        bestNeighborScore = score;
+                                        bestNeighbor = neighbor;
+                                    }
+                                }
+                                
+                                if (bestNeighbor) {
+                                    bestCell = {row: bestNeighbor.row, col: bestNeighbor.col, score: 70 + bestNeighborScore};
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // ШАГ 4: ЕСЛИ НЕ НАШЛИ ЦЕННЫХ КЛЕТОК, ИЩЕМ САМУЮ ИНФОРМАТИВНУЮ
+                if (!bestCell) {
+                    for (let row = 0; row < rows; row++) {
+                        for (let col = 0; col < cols; col++) {
+                            const cell = gameBoard[row][col];
+                            
+                            if (cell.state !== CELL_STATES.UNKNOWN) continue;
+                            if (emptyCells.some(ec => ec.row === row && ec.col === col)) continue;
+                            
+                            const infoValue = calculateInformationValue(row, col);
+                            const score = infoValue;
+                            
+                            if (score > bestScore) {
+                                bestScore = score;
+                                bestCell = {row, col, score};
+                            }
+                        }
+                    }
+                }
+                
+                // ШАГ 5: ОСОБЫЙ СЛУЧАЙ - ТРИАНГУЛЯЦИЯ (МАКСИМАЛЬНЫЙ ПРИОРИТЕТ)
+                // Ищем клетки между двумя контурами
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const cell = gameBoard[row][col];
+                        if (cell.state !== CELL_STATES.UNKNOWN) continue;
+                        if (emptyCells.some(ec => ec.row === row && ec.col === col)) continue;
+                        
+                        const neighbors = getAdjacentCells(row, col);
+                        let outlineCount = 0;
+                        
+                        neighbors.forEach(neighbor => {
+                            if (gameBoard[neighbor.row][neighbor.col].hasGoldOutline) {
+                                outlineCount++;
+                            }
+                        });
+                        
+                        if (outlineCount >= 2) {
+                            // Триангуляция - максимальный приоритет
+                            bestCell = {row, col, score: 200};
+                            break;
+                        }
+                    }
+                    if (bestCell && bestCell.score === 200) break;
+                }
+                
+                return bestCell;
             }
             
-            // Создание предпросмотров тактик
+            // Расчет информационной ценности клетки
+			function calculateInformationValue(row, col) {
+				let infoValue = 0;
+				const neighbors = getAdjacentCells(row, col);
+				
+				// Базовое значение: сколько соседей мы узнаем
+				let unknownNeighbors = 0;
+				neighbors.forEach(neighbor => {
+					const cell = gameBoard[neighbor.row][neighbor.col];
+					if (cell.state === CELL_STATES.UNKNOWN && 
+						!emptyCells.some(ec => ec.row === neighbor.row && ec.col === neighbor.col)) {
+						unknownNeighbors++;
+					}
+				});
+				
+				infoValue += unknownNeighbors * 15;
+				
+				// Бонус за центральное положение (максимум информации)
+				const neighborCount = neighbors.length;
+				if (neighborCount === 4) infoValue += 20;       // Центр
+				else if (neighborCount === 3) infoValue += 10;  // Край
+				else if (neighborCount === 2) infoValue -= 10;  // Угол
+				
+				// Штраф за клетки рядом с уже найденным золотом
+				let goldNeighbors = 0;
+				neighbors.forEach(neighbor => {
+					if (gameBoard[neighbor.row][neighbor.col].state === CELL_STATES.GOLD) {
+						goldNeighbors++;
+					}
+				});
+				
+				infoValue -= goldNeighbors * 25;
+				
+				// Бонус за клетки рядом с контурами (если у них нет золота)
+				let outlineNeighborCount = 0; // ИЗМЕНИЛИ ИМЯ ПЕРЕМЕННОЙ
+				neighbors.forEach(neighbor => {
+					if (gameBoard[neighbor.row][neighbor.col].hasGoldOutline) {
+						// Проверяем, есть ли у этого контура уже золото
+						const outlineAdjacentCells = getAdjacentCells(neighbor.row, neighbor.col); // ИЗМЕНИЛИ ИМЯ ПЕРЕМЕННОЙ
+						let hasGold = false;
+						outlineAdjacentCells.forEach(n => {
+							if (gameBoard[n.row][n.col].state === CELL_STATES.GOLD) {
+								hasGold = true;
+							}
+						});
+						if (!hasGold) {
+							outlineNeighborCount++; // ИСПОЛЬЗУЕМ НОВОЕ ИМЯ
+						}
+					}
+				});
+				
+				infoValue += outlineNeighborCount * 10; // ИСПОЛЬЗУЕМ НОВОЕ ИМЯ
+				
+				// Бонус за клетки, которые могут завершить алмазную формацию
+				for (const pos of DIAMOND_FORMATION) {
+					if (pos.row === row && pos.col === col) {
+						infoValue += 30;
+						break;
+					}
+				}
+				
+				// Сохраняем значение для отладки
+				gameBoard[row][col].infoValue = infoValue;
+				
+				return infoValue;
+			}
+            
+            // Подсчет неизвестных клеток
+            function countUnknownCells() {
+                let count = 0;
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        if (gameBoard[row][col].state === CELL_STATES.UNKNOWN) {
+                            count++;
+                        }
+                    }
+                }
+                return count;
+            }
+            
+            // Обновление подсказки следующего хода
+            function updateNextMoveHint() {
+                nextMoveHintCell = calculateNextMove();
+                
+                if (nextMoveHintCell) {
+                    nextMoveCellElement.textContent = `${nextMoveHintCell.row+1},${nextMoveHintCell.col+1}`;
+                    nextMoveCellElement.style.color = '#27ae60';
+                    nextMoveCellElement.style.fontWeight = 'bold';
+                    
+                    // Помечаем клетку как рекомендованную
+                    gameBoard[nextMoveHintCell.row][nextMoveHintCell.col].isRecommended = true;
+                } else {
+                    nextMoveCellElement.textContent = '--';
+                    nextMoveCellElement.style.color = '#666';
+                }
+                
+                renderGameBoard();
+            }
+            
+            // Переключение режима подсказки
+            function toggleNextMoveMode() {
+                nextMoveMode = !nextMoveMode;
+                
+                if (nextMoveMode) {
+                    nextMoveBtn.classList.add('active');
+                    nextMoveBtn.title = 'Подсказка хода (вкл)';
+                    updateNextMoveHint();
+                    showToast('Режим подсказки включен. Лучший ход будет подсвечиваться.', 'info');
+                } else {
+                    nextMoveBtn.classList.remove('active');
+                    nextMoveBtn.title = 'Подсказка хода';
+                    // Снимаем подсветку
+                    nextMoveHintCell = null;
+                    nextMoveCellElement.textContent = '--';
+                    nextMoveCellElement.style.color = '#666';
+                    renderGameBoard();
+                }
+            }
+            
+            // ЭКСПОРТ/ИМПОРТ
+            function generateExportCode() {
+                const codes = [];
+                
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const cell = gameBoard[row][col];
+                        
+                        let stateCode = CELL_CODES[cell.state];
+                        
+                        if (cell.hasGoldOutline) {
+                            stateCode = 'o';
+                        }
+                        
+                        if (stateCode !== 'u' || cell.hasGoldOutline) {
+                            const rowLetter = String.fromCharCode(65 + row);
+                            const cellCode = `${rowLetter}${col+1}${stateCode}`;
+                            codes.push(cellCode);
+                        }
+                    }
+                }
+                
+                return codes.join(',');
+            }
+            
+            function showExportModal() {
+                const code = generateExportCode();
+                exportCodeElement.textContent = code;
+                exportImportModal.classList.add('active');
+                exportImportOverlay.classList.add('active');
+            }
+            
+            function hideExportModal() {
+                exportImportModal.classList.remove('active');
+                exportImportOverlay.classList.remove('active');
+            }
+            
+			function copyToClipboard() {
+				const code = exportCodeElement.textContent;
+				navigator.clipboard.writeText(code).then(() => {
+					const copyBtn = document.getElementById('copy-btn');
+					copyBtn.textContent = 'Скопировано!';
+					copyBtn.classList.add('copied');
+					
+					setTimeout(() => {
+						copyBtn.textContent = 'Копировать';
+						copyBtn.classList.remove('copied');
+					}, 2000);
+				}).catch(err => {
+					console.error('Ошибка копирования: ', err);
+				});
+			}
+            
+            function importBoard() {
+                const code = importInput.value.trim();
+                if (!code) return;
+                
+                try {
+                    initGameBoard();
+                    
+                    const parts = code.split(',');
+                    let importedCount = 0;
+                    
+                    parts.forEach(part => {
+                        const match = part.match(/^([A-E])(\d+)([gnueo])$/i);
+                        if (match) {
+                            const rowLetter = match[1].toUpperCase();
+                            const col = parseInt(match[2]) - 1;
+                            const code = match[3].toLowerCase();
+                            
+                            const row = rowLetter.charCodeAt(0) - 65;
+                            
+                            if (row >= 0 && row < rows && col >= 0 && col < cols) {
+                                const cell = gameBoard[row][col];
+                                
+                                if (code === 'o') {
+                                    cell.state = CELL_STATES.UNKNOWN;
+                                    cell.hasGoldOutline = true;
+                                } else {
+                                    const state = CODE_CELLS[code];
+                                    if (state) {
+                                        cell.state = state;
+                                        cell.hasGoldOutline = false;
+                                    }
+                                }
+                                
+                                importedCount++;
+                            }
+                        }
+                    });
+                    
+                    analyzeBoard();
+                    renderGameBoard();
+                    updateCounters();
+                    if (nextMoveMode) updateNextMoveHint();
+                    
+                    importStatus.textContent = `Успешно загружено ${importedCount} клеток`;
+                    importStatus.className = 'import-status success';
+                    importStatus.style.display = 'block';
+                    
+                    importInput.value = '';
+                    
+                    setTimeout(() => {
+                        importStatus.style.display = 'none';
+                    }, 3000);
+                    
+                } catch (error) {
+                    importStatus.textContent = 'Ошибка загрузки. Проверьте формат кода.';
+                    importStatus.className = 'import-status error';
+                    importStatus.style.display = 'block';
+                }
+            }
+            
+            // Инициализация предпросмотров тактик (старая версия)
             function initTacticPreviews() {
-                // 1. Алмазная формация
                 createDiamondPreview();
-                
-                // 2. Центральный крест
                 createCrossPreview();
-                
-                // 3. Диагональный сканер
                 createDiagonalPreview();
-                
-                // 4. Триангуляция
                 createTriangulationPreview();
-                
-                // 5. Метод исключения
                 createExclusionPreview();
-                
-                // 6. Избегайте углов
                 createCornersPreview();
             }
             
-            // Создание предпросмотра алмазной формации
             function createDiamondPreview() {
                 const preview = document.getElementById('diamond-preview');
                 preview.innerHTML = '';
@@ -930,7 +1657,6 @@
                         const cell = document.createElement('div');
                         cell.className = 'preview-cell';
                         
-                        // Алмазная формация: (2,2), (2,5), (4,2), (4,5)
                         const isStart = (row === 1 && col === 1) || (row === 1 && col === 4) || 
                                        (row === 3 && col === 1) || (row === 3 && col === 4);
                         
@@ -947,7 +1673,6 @@
                 }
             }
             
-            // Создание предпросмотра центрального креста
             function createCrossPreview() {
                 const preview = document.getElementById('cross-preview');
                 preview.innerHTML = '';
@@ -957,7 +1682,6 @@
                         const cell = document.createElement('div');
                         cell.className = 'preview-cell';
                         
-                        // Центральный крест: (2,3), (3,2), (3,5), (4,3)
                         const isStart = (row === 1 && col === 2) || (row === 2 && col === 1) || 
                                        (row === 2 && col === 4) || (row === 3 && col === 2);
                         
@@ -974,7 +1698,6 @@
                 }
             }
             
-            // Создание предпросмотра диагонального сканера
             function createDiagonalPreview() {
                 const preview = document.getElementById('diagonal-preview');
                 preview.innerHTML = '';
@@ -984,7 +1707,6 @@
                         const cell = document.createElement('div');
                         cell.className = 'preview-cell';
                         
-                        // Диагональный сканер: (1,3), (2,5), (4,2), (5,4)
                         const isStart = (row === 0 && col === 2) || (row === 1 && col === 4) || 
                                        (row === 3 && col === 1) || (row === 4 && col === 3);
                         
@@ -1001,7 +1723,6 @@
                 }
             }
             
-            // Создание предпросмотра триангуляции
             function createTriangulationPreview() {
                 const preview = document.getElementById('triangulation-preview');
                 preview.innerHTML = '';
@@ -1011,7 +1732,6 @@
                         const cell = document.createElement('div');
                         cell.className = 'preview-cell';
                         
-                        // Триангуляция: два контура с золотом между ними
                         const isOutline = (row === 1 && col === 1) || (row === 1 && col === 3);
                         const isGold = (row === 1 && col === 2);
                         
@@ -1030,7 +1750,6 @@
                 }
             }
             
-            // Создание предпросмотра метода исключения
             function createExclusionPreview() {
                 const preview = document.getElementById('exclusion-preview');
                 preview.innerHTML = '';
@@ -1040,7 +1759,6 @@
                         const cell = document.createElement('div');
                         cell.className = 'preview-cell';
                         
-                        // Метод исключения: центральная клетка с пустыми соседями
                         const isCenter = (row === 2 && col === 2);
                         const isNeighbor = (row === 2 && col === 1) || (row === 2 && col === 3) || 
                                           (row === 1 && col === 2) || (row === 3 && col === 2);
@@ -1059,7 +1777,6 @@
                 }
             }
             
-            // Создание предпросмотра "Избегайте углов"
             function createCornersPreview() {
                 const preview = document.getElementById('corners-preview');
                 preview.innerHTML = '';
@@ -1069,7 +1786,6 @@
                         const cell = document.createElement('div');
                         cell.className = 'preview-cell';
                         
-                        // Углы vs центр
                         const isCorner = (row === 0 && col === 0) || (row === 0 && col === 5) || 
                                         (row === 4 && col === 0) || (row === 4 && col === 5);
                         const isCenter = (row === 2 && col === 2) || (row === 2 && col === 3);
@@ -1089,7 +1805,17 @@
                 }
             }
             
-            // Открытие модального окна с тактикой
+            // Настройка обработчиков для карточек тактик
+            function setupTacticCards() {
+                document.querySelectorAll('.tactic-card').forEach(card => {
+                    card.addEventListener('click', function() {
+                        const tactic = this.getAttribute('data-tactic');
+                        openTacticModal(tactic);
+                    });
+                });
+            }
+            
+            // Открытие модального окна с тактикой (старая версия с изображением)
             function openTacticModal(tactic) {
                 let title = '';
                 let rank = '';
@@ -1118,7 +1844,7 @@
                             <p><strong>Результат:</strong> Быстрое исключение пустых зон, максимальная информация с минимального количества ходов.</p>
                         </div>
                         <div class="tactic-visualization">
-                            <div class="tactic-board" id="diamond-board">
+                            <div class="tactic-board" id="tactic-board">
                                 <!-- Визуализация будет создана динамически -->
                             </div>
                             <div class="visual-label">Желтые клетки - оптимальные стартовые точки</div>
@@ -1147,7 +1873,7 @@
                             <p><strong>Когда использовать:</strong> Если подозреваете, что золото сконцентрировано в центральной части поля.</p>
                         </div>
                         <div class="tactic-visualization">
-                            <div class="tactic-board" id="cross-board">
+                            <div class="tactic-board" id="tactic-board">
                                 <!-- Визуализация будет создана динамически -->
                             </div>
                             <div class="visual-label">Стартовые точки образуют смещенный крест</div>
@@ -1176,7 +1902,7 @@
                             <p><strong>Недостаток:</strong> Одна точка (1,3) имеет только 3 соседа вместо 4.</p>
                         </div>
                         <div class="tactic-visualization">
-                            <div class="tactic-board" id="diagonal-board">
+                            <div class="tactic-board" id="tactic-board">
                                 <!-- Визуализация будет создана динамически -->
                             </div>
                             <div class="visual-label">Диагональное расположение стартовых точек</div>
@@ -1197,7 +1923,7 @@
                             <p><strong>Как использовать:</strong> Как только видите такую ситуацию — открывайте общую клетку первой!</p>
                         </div>
                         <div class="tactic-visualization">
-                            <div class="tactic-board" id="triangulation-board">
+                            <div class="tactic-board" id="tactic-board">
                                 <!-- Визуализация будет создана динамически -->
                             </div>
                             <div class="visual-label">Контуры указывают на золотую ячейку между ними</div>
@@ -1221,7 +1947,7 @@
                             <p><strong>Результат:</strong> Экономия 20-30% ходов за игру!</p>
                         </div>
                         <div class="tactic-visualization">
-                            <div class="tactic-board" id="exclusion-board">
+                            <div class="tactic-board" id="tactic-board">
                                 <!-- Визуализация будет создана динамически -->
                             </div>
                             <div class="visual-label">Серая рамка и её пустые соседи</div>
@@ -1251,7 +1977,7 @@
                             <p><strong>Правило:</strong> Всегда начинайте с клеток, у которых 4 соседа!</p>
                         </div>
                         <div class="tactic-visualization">
-                            <div class="tactic-board" id="corners-board">
+                            <div class="tactic-board" id="tactic-board">
                                 <!-- Визуализация будет создана динамически -->
                             </div>
                             <div class="visual-label">✗ - плохие стартовые точки, ✓ - хорошие</div>
@@ -1277,25 +2003,9 @@
                 document.body.style.overflow = 'hidden';
             }
             
-            // Создание визуализации для модального окна
+            // Создание визуализации для модального окна (старая версия)
             function createTacticVisualization(tactic) {
-                let boardId = '';
-                
-                if (tactic === 'diamond') {
-                    boardId = 'diamond-board';
-                } else if (tactic === 'cross') {
-                    boardId = 'cross-board';
-                } else if (tactic === 'diagonal') {
-                    boardId = 'diagonal-board';
-                } else if (tactic === 'triangulation') {
-                    boardId = 'triangulation-board';
-                } else if (tactic === 'exclusion') {
-                    boardId = 'exclusion-board';
-                } else if (tactic === 'avoid-corners') {
-                    boardId = 'corners-board';
-                }
-                
-                const board = document.getElementById(boardId);
+                const board = document.getElementById('tactic-board');
                 if (!board) return;
                 
                 board.innerHTML = '';
@@ -1437,31 +2147,66 @@
                 }
             }
             
-            // Закрытие модального окна
+            // Вспомогательная функция для показа уведомлений
+            function showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.textContent = message;
+                toast.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 12px 20px;
+                    border-radius: 6px;
+                    color: white;
+                    font-weight: bold;
+                    z-index: 2000;
+                    opacity: 0;
+                    transform: translateX(100px);
+                    transition: opacity 0.3s, transform 0.3s;
+                `;
+                
+                if (type === 'success') {
+                    toast.style.backgroundColor = '#27ae60';
+                } else if (type === 'error') {
+                    toast.style.backgroundColor = '#e74c3c';
+                } else {
+                    toast.style.backgroundColor = '#3498db';
+                }
+                
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.style.opacity = '1';
+                    toast.style.transform = 'translateX(0)';
+                }, 10);
+                
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(100px)';
+                    setTimeout(() => {
+                        document.body.removeChild(toast);
+                    }, 300);
+                }, 3000);
+            }
+            
+            // Закрытие модальных окон
             function closeModal() {
                 modalOverlay.classList.remove('active');
                 document.body.style.overflow = 'auto';
             }
-            
-            // Базовые функции игры (остаются без изменений)
-            // ... [остальной код игры остается без изменений] ...
             
             // Проверка валидности клетки
             function isValidCell(row, col) {
                 return row >= 0 && row < rows && col >= 0 && col < cols;
             }
             
-            // Получение соседних клеток (только по вертикали/горизонтали)
+            // Получение соседних клеток
             function getAdjacentCells(row, col) {
                 const neighbors = [];
                 
-                // Вверх
                 if (row > 0) neighbors.push({row: row-1, col});
-                // Вниз
                 if (row < rows-1) neighbors.push({row: row+1, col});
-                // Влево
                 if (col > 0) neighbors.push({row, col: col-1});
-                // Вправо
                 if (col < cols-1) neighbors.push({row, col: col+1});
                 
                 return neighbors;
@@ -1476,19 +2221,15 @@
                         const cell = gameBoard[row][col];
                         const cellElement = document.createElement('div');
                         
-                        // Определяем класс клетки на основе состояния и шанса
                         let cellClass = `cell ${cell.state}`;
                         
-                        // Если клетка помечена как пустая
                         const isEmpty = emptyCells.some(emptyCell => 
                             emptyCell.row === row && emptyCell.col === col);
                         
-                        // Если клетка помечена как возможная золотая с шансом >= 50%
                         const isPossibleGold = possibleGoldCells.some(goldCell => 
                             goldCell.row === row && goldCell.col === col && 
                             goldCell.chance >= 50);
                         
-                        // Приоритеты отображения: Золотая > Пустая > Возможная золотая > Обычная > Неизвестная
                         if (cell.state === CELL_STATES.GOLD) {
                             cellClass = `cell ${CELL_STATES.GOLD}`;
                         } else if (isEmpty && cell.state === CELL_STATES.UNKNOWN) {
@@ -1503,29 +2244,27 @@
                         
                         cellElement.className = cellClass;
                         
-                        // Добавляем номер клетки (координаты)
                         const cellNumber = document.createElement('div');
                         cellNumber.className = 'cell-number';
                         cellNumber.textContent = `${row+1},${col+1}`;
                         cellElement.appendChild(cellNumber);
                         
-                        // Добавляем золотой контур если есть
                         if (cell.hasGoldOutline) {
                             cellElement.classList.add('gold-outline');
                         }
                         
-                        // Добавляем символ для золотых клеток
+                        if (nextMoveMode && cell.isRecommended) {
+                            cellElement.classList.add('next-move-hint');
+                        }
+                        
                         if (cell.state === CELL_STATES.GOLD) {
                             cellElement.textContent = '★';
                         }
                         
-                        // Показываем шанс для ВСЕХ клеток с контурами и их соседей
-                        // Если клетка имеет шанс > 0 (соседствует с контуром) и она неизвестна
                         if (cell.goldChance > 0 && cell.state === CELL_STATES.UNKNOWN) {
                             const chanceElement = document.createElement('div');
                             chanceElement.className = 'gold-chance';
                             
-                            // Определяем класс для стилизации процента
                             if (cell.goldChance >= 50) {
                                 chanceElement.classList.add('high');
                             } else {
@@ -1536,7 +2275,6 @@
                             cellElement.appendChild(chanceElement);
                         }
                         
-                        // Добавляем обработчик клика
                         cellElement.addEventListener('click', () => handleCellClick(row, col));
                         
                         gameBoardElement.appendChild(cellElement);
@@ -1548,12 +2286,9 @@
             function handleCellClick(row, col) {
                 const cell = gameBoard[row][col];
                 
-                // Если включен режим установки золотых контуров
                 if (outlineMode) {
-                    // Переключаем состояние золотого контура
                     cell.hasGoldOutline = !cell.hasGoldOutline;
                 } else {
-                    // Циклическое изменение состояния клетки
                     if (cell.state === CELL_STATES.UNKNOWN) {
                         cell.state = CELL_STATES.NORMAL;
                     } else if (cell.state === CELL_STATES.NORMAL) {
@@ -1563,243 +2298,303 @@
                     }
                 }
                 
-                // Автоматически запускаем анализ после каждого действия
                 analyzeBoard();
-                
-                // Обновляем отображение
                 renderGameBoard();
                 updateCounters();
+                if (nextMoveMode) updateNextMoveHint();
             }
             
-            // Анализ поля для определения пустых и возможных золотых ячеек
-            function analyzeBoard() {
-                // Сбрасываем предыдущие результаты
-                emptyCells = [];
-                possibleGoldCells = [];
-                
-                // Сбрасываем шансы для всех клеток
-                for (let row = 0; row < rows; row++) {
-                    for (let col = 0; col < cols; col++) {
-                        gameBoard[row][col].goldChance = 0;
-                    }
-                }
-                
-                // Шаг 1: Правило - Если ячейка раскрыта (обычная) и не имеет золотого контура
-                // все её соседи становятся пустыми
-                for (let row = 0; row < rows; row++) {
-                    for (let col = 0; col < cols; col++) {
-                        const cell = gameBoard[row][col];
-                        
-                        if (cell.state === CELL_STATES.NORMAL && !cell.hasGoldOutline) {
-                            const neighbors = getAdjacentCells(row, col);
-                            
-                            neighbors.forEach(neighbor => {
-                                const neighborCell = gameBoard[neighbor.row][neighbor.col];
-                                
-                                // Сосед становится пустым, если он неизвестен
-                                if (neighborCell.state === CELL_STATES.UNKNOWN) {
-                                    // Проверяем, нет ли уже этой клетки в emptyCells
-                                    if (!emptyCells.some(c => c.row === neighbor.row && c.col === neighbor.col)) {
-                                        emptyCells.push({row: neighbor.row, col: neighbor.col});
-                                    }
-                                }
-                            });
-                        }
-                    }
-                }
-                
-                // Шаг 2: Собираем все клетки с золотыми контурами
-                const outlineCells = [];
-                for (let row = 0; row < rows; row++) {
-                    for (let col = 0; col < cols; col++) {
-                        if (gameBoard[row][col].hasGoldOutline) {
-                            outlineCells.push({row, col});
-                        }
-                    }
-                }
-                
-                // Шаг 3: Для каждой клетки с контуром анализируем её соседей
-                // Золотой контур делает соседей возможными для золотых ячеек (базовый шанс 25%)
-                const goldChanceMap = new Map();
-                
-                outlineCells.forEach(outlineCell => {
-                    const {row, col} = outlineCell;
-                    const neighbors = getAdjacentCells(row, col);
-                    
-                    neighbors.forEach(neighbor => {
-                        const neighborCell = gameBoard[neighbor.row][neighbor.col];
-                        
-                        // Клетка может быть золотой, если она неизвестна или уже помечена как золотая
-                        if (neighborCell.state === CELL_STATES.UNKNOWN || neighborCell.state === CELL_STATES.GOLD) {
-                            const key = `${neighbor.row},${neighbor.col}`;
-                            
-                            // Базовый шанс от одного контура - 25%
-                            let currentChance = 25;
-                            
-                            if (goldChanceMap.has(key)) {
-                                // Если клетка уже в карте, увеличиваем шанс
-                                currentChance = goldChanceMap.get(key).chance;
-                                currentChance += 25; // Каждый дополнительный контур добавляет 25%
-                            }
-                            
-                            goldChanceMap.set(key, {
-                                row: neighbor.row,
-                                col: neighbor.col,
-                                chance: currentChance
-                            });
-                        }
-                    });
-                });
-                
-                // Шаг 4: Анализируем клетки между двумя контурами (повышаем шанс)
-                // Если две клетки с контурами находятся рядом (по горизонтали или вертикали)
-                // то клетка между ними имеет повышенный шанс быть золотой
-                for (let i = 0; i < outlineCells.length; i++) {
-                    for (let j = i + 1; j < outlineCells.length; j++) {
-                        const cell1 = outlineCells[i];
-                        const cell2 = outlineCells[j];
-                        
-                        // Проверяем, находятся ли клетки рядом по горизонтали
-                        if (cell1.row === cell2.row && Math.abs(cell1.col - cell2.col) === 2) {
-                            // Между ними есть одна клетка
-                            const middleCol = Math.min(cell1.col, cell2.col) + 1;
-                            const middleRow = cell1.row;
-                            
-                            if (isValidCell(middleRow, middleCol) && 
-                                gameBoard[middleRow][middleCol].state === CELL_STATES.UNKNOWN) {
-                                const key = `${middleRow},${middleCol}`;
-                                let currentChance = goldChanceMap.has(key) ? goldChanceMap.get(key).chance : 0;
-                                // Клетка между двумя контурами получает +50% к шансу
-                                goldChanceMap.set(key, {
-                                    row: middleRow,
-                                    col: middleCol,
-                                    chance: currentChance + 10
-                                });
-                            }
-                        }
-                        
-                        // Проверяем, находятся ли клетки рядом по вертикали
-                        if (cell1.col === cell2.col && Math.abs(cell1.row - cell2.row) === 2) {
-                            // Между ними есть одна клетка
-                            const middleRow = Math.min(cell1.row, cell2.row) + 1;
-                            const middleCol = cell1.col;
-                            
-                            if (isValidCell(middleRow, middleCol) && 
-                                gameBoard[middleRow][middleCol].state === CELL_STATES.UNKNOWN) {
-                                const key = `${middleRow},${middleCol}`;
-                                let currentChance = goldChanceMap.has(key) ? goldChanceMap.get(key).chance : 0;
-                                // Клетка между двумя контурами получает +10% к шансу
-                                goldChanceMap.set(key, {
-                                    row: middleRow,
-                                    col: middleCol,
-                                    chance: currentChance + 10
-                                });
-                            }
-                        }
-                        
-                        // Проверяем, являются ли клетки соседями (шанс, что обе золотые)
-                        if (Math.abs(cell1.row - cell2.row) + Math.abs(cell1.col - cell2.col) === 1) {
-                            // Два контура рядом - каждая из них может быть золотой
-                            // Увеличиваем шанс для обеих клеток
-                            const key1 = `${cell1.row},${cell1.col}`;
-                            const key2 = `${cell2.row},${cell2.col}`;
-                            
-                            if (isValidCell(cell1.row, cell1.col) && 
-                                gameBoard[cell1.row][cell1.col].state === CELL_STATES.UNKNOWN) {
-                                let chance1 = goldChanceMap.has(key1) ? goldChanceMap.get(key1).chance : 0;
-                                // Контуры рядом получают +10% к шансу быть золотыми
-                                goldChanceMap.set(key1, {
-                                    row: cell1.row,
-                                    col: cell1.col,
-                                    chance: chance1 + 10
-                                });
-                            }
-                            
-                            if (isValidCell(cell2.row, cell2.col) && 
-                                gameBoard[cell2.row][cell2.col].state === CELL_STATES.UNKNOWN) {
-                                let chance2 = goldChanceMap.has(key2) ? goldChanceMap.get(key2).chance : 0;
-                                // Контуры рядом получают +10% к шансу быть золотыми
-                                goldChanceMap.set(key2, {
-                                    row: cell2.row,
-                                    col: cell2.col,
-                                    chance: chance2 + 10
-                                });
-                            }
-                        }
-                    }
-                }
-                
-                // Шаг 5: Обновляем шансы в gameBoard и добавляем в possibleGoldCells если шанс >= 50%
-                goldChanceMap.forEach((value, key) => {
-                    const {row, col, chance} = value;
-                    
-                    // Ограничиваем шанс 100%
-                    const finalChance = Math.min(chance, 95);
-                    
-                    // Обновляем шанс в gameBoard
-                    gameBoard[row][col].goldChance = finalChance;
-                    
-                    // Добавляем в possibleGoldCells если шанс >= 50% и клетка неизвестна
-                    if (finalChance >= 50 && gameBoard[row][col].state === CELL_STATES.UNKNOWN) {
-                        possibleGoldCells.push({row, col, chance: finalChance});
-                    }
-                });
-                
-                // Шаг 6: Учитываем уже найденные золотые ячейки
-                // Если клетка уже помечена как золотая, её соседи с контурами должны быть пустыми
-                for (let row = 0; row < rows; row++) {
-                    for (let col = 0; col < cols; col++) {
-                        if (gameBoard[row][col].state === CELL_STATES.GOLD) {
-                            const neighbors = getAdjacentCells(row, col);
-                            
-                            neighbors.forEach(neighbor => {
-                                // Если сосед имеет золотой контур и неизвестен, он должен быть пустым
-                                if (isValidCell(neighbor.row, neighbor.col) &&
-                                    gameBoard[neighbor.row][neighbor.col].hasGoldOutline &&
-                                    gameBoard[neighbor.row][neighbor.col].state === CELL_STATES.UNKNOWN) {
-                                    
-                                    if (!emptyCells.some(c => c.row === neighbor.row && c.col === neighbor.col)) {
-                                        emptyCells.push({row: neighbor.row, col: neighbor.col});
-                                    }
-                                    
-                                    // Удаляем из possibleGoldCells если там есть
-                                    const index = possibleGoldCells.findIndex(c => 
-                                        c.row === neighbor.row && c.col === neighbor.col);
-                                    if (index !== -1) {
-                                        possibleGoldCells.splice(index, 1);
-                                    }
-                                    
-                                    // Обнуляем шанс для этой клетки
-                                    gameBoard[neighbor.row][neighbor.col].goldChance = 0;
-                                }
-                            });
-                        }
-                    }
-                }
-                
-                // Шаг 7: Клетки с золотым контуром не могут быть золотыми
-                // Помечаем их как пустые если они неизвестны и обнуляем их шанс
-                outlineCells.forEach(cell => {
-                    if (gameBoard[cell.row][cell.col].state === CELL_STATES.UNKNOWN) {
-                        if (!emptyCells.some(c => c.row === cell.row && c.col === cell.col)) {
-                            emptyCells.push({row: cell.row, col: cell.col});
-                        }
-                        
-                        // Удаляем из possibleGoldCells если там есть
-                        const index = possibleGoldCells.findIndex(c => 
-                            c.row === cell.row && c.col === cell.col);
-                        if (index !== -1) {
-                            possibleGoldCells.splice(index, 1);
-                        }
-                        
-                        // Обнуляем шанс для клеток с контурами
-                        gameBoard[cell.row][cell.col].goldChance = 0;
-                    }
-                });
-                
-                // Шаг 8: Обновляем счетчики
-                updateCounters();
-            }
+			// Анализ поля с улучшенной логикой (добавлен логический вывод)
+			function analyzeBoard() {
+				emptyCells = [];
+				possibleGoldCells = [];
+				
+				for (let row = 0; row < rows; row++) {
+					for (let col = 0; col < cols; col++) {
+						gameBoard[row][col].goldChance = 0;
+					}
+				}
+				
+				// ШАГ 1: ПУСТЫЕ СОСЕДИ ОБЫЧНЫХ КЛЕТОК БЕЗ КОНТУРОВ
+				for (let row = 0; row < rows; row++) {
+					for (let col = 0; col < cols; col++) {
+						const cell = gameBoard[row][col];
+						
+						if (cell.state === CELL_STATES.NORMAL && !cell.hasGoldOutline) {
+							const neighbors = getAdjacentCells(row, col);
+							
+							neighbors.forEach(neighbor => {
+								const neighborCell = gameBoard[neighbor.row][neighbor.col];
+								
+								if (neighborCell.state === CELL_STATES.UNKNOWN) {
+									if (!emptyCells.some(c => c.row === neighbor.row && c.col === neighbor.col)) {
+										emptyCells.push({row: neighbor.row, col: neighbor.col});
+									}
+								}
+							});
+						}
+					}
+				}
+				
+				// ШАГ 2: СОБИРАЕМ КЛЕТКИ С КОНТУРАМИ
+				const outlineCells = [];
+				for (let row = 0; row < rows; row++) {
+					for (let col = 0; col < cols; col++) {
+						if (gameBoard[row][col].hasGoldOutline) {
+							outlineCells.push({row, col});
+						}
+					}
+				}
+				
+				// ШАГ 3: ЛОГИЧЕСКИЙ ВЫВОД - ПРИНУДИТЕЛЬНОЕ ЗОЛОТО
+				// Если у контура остался только один неизвестный сосед - он должен быть золотым
+				const forcedGoldCells = [];
+
+				outlineCells.forEach(outlineCell => {
+					const {row, col} = outlineCell;
+					const neighbors = getAdjacentCells(row, col);
+					
+					// Считаем сколько у контура уже найдено золота и сколько неизвестных соседей
+					let goldCount = 0;
+					let unknownNeighbors = [];
+					
+					neighbors.forEach(neighbor => {
+						const neighborCell = gameBoard[neighbor.row][neighbor.col];
+						if (neighborCell.state === CELL_STATES.GOLD) {
+							goldCount++;
+						} else if (neighborCell.state === CELL_STATES.UNKNOWN && 
+								  !emptyCells.some(ec => ec.row === neighbor.row && ec.col === neighbor.col)) {
+							unknownNeighbors.push(neighbor);
+						}
+					});
+					
+					// Если у контура еще не найдено золото и остался только один неизвестный сосед
+					// Этот сосед ДОЛЖЕН быть золотым (минимум 1 золото!)
+					if (goldCount === 0 && unknownNeighbors.length === 1) {
+						const forcedGold = unknownNeighbors[0];
+						forcedGoldCells.push(forcedGold);
+					}
+				});
+				
+				// ШАГ 4: АНАЛИЗ КОНТУРОВ
+				const goldChanceMap = new Map();
+				
+				outlineCells.forEach(outlineCell => {
+					const {row, col} = outlineCell;
+					const neighbors = getAdjacentCells(row, col);
+					
+					let goldCount = 0;
+					let normalCount = 0;
+					let unknownCount = 0;
+					
+					neighbors.forEach(neighbor => {
+						const neighborCell = gameBoard[neighbor.row][neighbor.col];
+						if (neighborCell.state === CELL_STATES.GOLD) goldCount++;
+						if (neighborCell.state === CELL_STATES.NORMAL) normalCount++;
+						if (neighborCell.state === CELL_STATES.UNKNOWN) unknownCount++;
+					});
+					
+					// Базовый шанс для этого контура
+					let baseChancePerCell = 0;
+					
+					if (goldCount === 0) {
+						// Если у контура нет золота, минимум 1 золото должно быть среди соседей
+						if (unknownCount > 0) {
+							baseChancePerCell = 100 / unknownCount;
+						}
+					} else {
+						// Если у контура уже есть золото, шансы снижаются
+						baseChancePerCell = Math.max(100 - (goldCount * 50), 10) / Math.max(unknownCount, 1);
+					}
+					
+					// Применяем шансы к каждому неизвестному соседу
+					neighbors.forEach(neighbor => {
+						const neighborCell = gameBoard[neighbor.row][neighbor.col];
+						
+						if (neighborCell.state === CELL_STATES.UNKNOWN && 
+							!emptyCells.some(ec => ec.row === neighbor.row && ec.col === neighbor.col)) {
+							
+							const key = `${neighbor.row},${neighbor.col}`;
+							let currentChance = baseChancePerCell;
+							
+							if (goldChanceMap.has(key)) {
+								// ВАЖНО: СУММИРУЕМ шансы от разных контуров, но не более 95%
+								const existingChance = goldChanceMap.get(key).chance;
+								currentChance = existingChance + (baseChancePerCell * 0.7); // Коэффициент 0.7 чтобы не зашкаливало
+							}
+							
+							goldChanceMap.set(key, {
+								row: neighbor.row,
+								col: neighbor.col,
+								chance: Math.min(currentChance, 95)
+							});
+						}
+					});
+				});
+				
+				// ШАГ 4.5: ОСОБАЯ ОБРАБОТКА КЛЕТОК МЕЖДУ КОНТУРАМИ
+				goldChanceMap.forEach((value, key) => {
+					const {row, col, chance} = value;
+					
+					// Проверяем, от скольких контуров эта клетка получает шансы
+					let outlineCount = 0;
+					const neighbors = getAdjacentCells(row, col);
+					
+					neighbors.forEach(neighbor => {
+						if (gameBoard[neighbor.row][neighbor.col].hasGoldOutline) {
+							outlineCount++;
+						}
+					});
+					
+					// Если клетка получает шансы от 2+ контуров
+					if (outlineCount >= 2) {
+						// Повышаем шанс значительно
+						const boostedChance = Math.min(chance * 1.5, 90);
+						goldChanceMap.set(key, {
+							row: row,
+							col: col,
+							chance: boostedChance
+						});
+						
+						// Дополнительно: если клетка находится РЯДОМ с двумя контурами
+						// (не обязательно сосед обоих, но в зоне влияния)
+						// Это потенциальная триангуляция!
+					}
+				});
+				
+				// ШАГ 5: ТРИАНГУЛЯЦИЯ (МАКСИМАЛЬНЫЙ ШАНС)
+				for (let i = 0; i < outlineCells.length; i++) {
+					for (let j = i + 1; j < outlineCells.length; j++) {
+						const cell1 = outlineCells[i];
+						const cell2 = outlineCells[j];
+						
+						// Проверяем все возможные клетки между контурами
+						// Горизонтальное соседство
+						if (cell1.row === cell2.row && Math.abs(cell1.col - cell2.col) === 2) {
+							const middleCol = Math.min(cell1.col, cell2.col) + 1;
+							const middleRow = cell1.row;
+							
+							if (isValidCell(middleRow, middleCol) && 
+								gameBoard[middleRow][middleCol].state === CELL_STATES.UNKNOWN) {
+								const key = `${middleRow},${middleCol}`;
+								goldChanceMap.set(key, {
+									row: middleRow,
+									col: middleCol,
+									chance: 95 // Максимальный шанс для триангуляции
+								});
+							}
+						}
+						
+						// Вертикальное соседство
+						if (cell1.col === cell2.col && Math.abs(cell1.row - cell2.row) === 2) {
+							const middleRow = Math.min(cell1.row, cell2.row) + 1;
+							const middleCol = cell1.col;
+							
+							if (isValidCell(middleRow, middleCol) && 
+								gameBoard[middleRow][middleCol].state === CELL_STATES.UNKNOWN) {
+								const key = `${middleRow},${middleCol}`;
+								goldChanceMap.set(key, {
+									row: middleRow,
+									col: middleCol,
+									chance: 95
+								});
+							}
+						}
+						
+						// Диагональное соседство
+						if (Math.abs(cell1.row - cell2.row) === 1 && Math.abs(cell1.col - cell2.col) === 1) {
+							// Клетка, которая соседствует с обоими контурами
+							const possibleCells = [
+								{row: cell1.row, col: cell2.col},
+								{row: cell2.row, col: cell1.col}
+							];
+							
+							possibleCells.forEach(pos => {
+								if (isValidCell(pos.row, pos.col) && 
+									gameBoard[pos.row][pos.col].state === CELL_STATES.UNKNOWN) {
+									const key = `${pos.row},${pos.col}`;
+									const existingChance = goldChanceMap.has(key) ? goldChanceMap.get(key).chance : 0;
+									goldChanceMap.set(key, {
+										row: pos.row,
+										col: pos.col,
+										chance: Math.max(existingChance, 80) // Высокий шанс
+									});
+								}
+							});
+						}
+					}
+				}
+				
+				// ШАГ 6: ПРИМЕНЯЕМ ПРИНУДИТЕЛЬНОЕ ЗОЛОТО (100% ШАНС)
+				forcedGoldCells.forEach(forcedGold => {
+					const key = `${forcedGold.row},${forcedGold.col}`;
+					goldChanceMap.set(key, {
+						row: forcedGold.row,
+						col: forcedGold.col,
+						chance: 100
+					});
+				});
+				
+				// ШАГ 7: ОБНОВЛЯЕМ ШАНСЫ
+				goldChanceMap.forEach((value, key) => {
+					const {row, col, chance} = value;
+					
+					const finalChance = Math.min(chance, 100);
+					gameBoard[row][col].goldChance = finalChance;
+					
+					if (finalChance >= 50 && gameBoard[row][col].state === CELL_STATES.UNKNOWN) {
+						possibleGoldCells.push({row, col, chance: finalChance});
+					}
+				});
+				
+				// ШАГ 8: УЧИТЫВАЕМ НАЙДЕННЫЕ ЗОЛОТЫЕ ЯЧЕЙКИ
+				for (let row = 0; row < rows; row++) {
+					for (let col = 0; col < cols; col++) {
+						if (gameBoard[row][col].state === CELL_STATES.GOLD) {
+							const neighbors = getAdjacentCells(row, col);
+							
+							neighbors.forEach(neighbor => {
+								if (isValidCell(neighbor.row, neighbor.col) &&
+									gameBoard[neighbor.row][neighbor.col].hasGoldOutline &&
+									gameBoard[neighbor.row][neighbor.col].state === CELL_STATES.UNKNOWN) {
+									
+									// Клетки с контурами не могут быть золотыми (оставляем это правило)
+									if (!emptyCells.some(c => c.row === neighbor.row && c.col === neighbor.col)) {
+										emptyCells.push({row: neighbor.row, col: neighbor.col});
+									}
+									
+									const index = possibleGoldCells.findIndex(c => 
+										c.row === neighbor.row && c.col === neighbor.col);
+									if (index !== -1) {
+										possibleGoldCells.splice(index, 1);
+									}
+									
+									gameBoard[neighbor.row][neighbor.col].goldChance = 0;
+								}
+							});
+						}
+					}
+				}
+				
+				// ШАГ 9: КЛЕТКИ С КОНТУРАМИ НЕ МОГУТ БЫТЬ ЗОЛОТЫМИ
+				outlineCells.forEach(cell => {
+					if (gameBoard[cell.row][cell.col].state === CELL_STATES.UNKNOWN) {
+						if (!emptyCells.some(c => c.row === cell.row && c.col === cell.col)) {
+							emptyCells.push({row: cell.row, col: cell.col});
+						}
+						
+						const index = possibleGoldCells.findIndex(c => 
+							c.row === cell.row && c.col === cell.col);
+						if (index !== -1) {
+							possibleGoldCells.splice(index, 1);
+						}
+						
+						gameBoard[cell.row][cell.col].goldChance = 0;
+					}
+				});
+				
+				updateCounters();
+			}
             
             // Обновление счетчиков
             function updateCounters() {
@@ -1818,22 +2613,34 @@
                 possibleGoldCountElement.textContent = possibleGoldCells.length;
             }
             
-            // Переключение режима установки золотых контуров
+            // Переключение режима контуров
             function toggleOutlineMode() {
                 outlineMode = !outlineMode;
                 
                 if (outlineMode) {
                     outlineModeBtn.classList.add('active');
-                    outlineModeBtn.textContent = 'Режим контуров (вкл)';
+                    showToast('Режим золотых контуров включен. Кликайте на клетки чтобы добавить/убрать контур', 'info');
                 } else {
                     outlineModeBtn.classList.remove('active');
-                    outlineModeBtn.textContent = 'Золотые контуры';
                 }
             }
             
             // Назначение обработчиков событий
             newGameBtn.addEventListener('click', initGameBoard);
             outlineModeBtn.addEventListener('click', toggleOutlineMode);
+            nextMoveBtn.addEventListener('click', toggleNextMoveMode);
+            exportBtn.addEventListener('click', showExportModal);
+            
+            // Обработчики для экспорта/импорта
+            copyBtn.addEventListener('click', copyToClipboard);
+            loadBtn.addEventListener('click', importBoard);
+            closeExportModal.addEventListener('click', hideExportModal);
+            
+            importInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    importBoard();
+                }
+            });
             
             // Обработчики для модального окна
             closeModalBtn.addEventListener('click', closeModal);
@@ -1843,17 +2650,20 @@
                 }
             });
             
-            // Закрытие модального окна по клавише Escape
+            // Закрытие по Escape
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
-                    closeModal();
+                if (e.key === 'Escape') {
+                    if (modalOverlay.classList.contains('active')) {
+                        closeModal();
+                    }
+                    if (exportImportModal.classList.contains('active')) {
+                        hideExportModal();
+                    }
                 }
             });
             
-            // Инициализация игры при загрузке
+            // Инициализация игры
             initGameBoard();
-            
-            // Запускаем начальный анализ
             analyzeBoard();
         });
     </script>
@@ -1862,4 +2672,3 @@
 	<!-- End Cloudflare Web Analytics -->
 </body>
 </html>
-

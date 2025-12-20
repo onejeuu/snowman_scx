@@ -17,8 +17,6 @@
 
 При возникновений багов и предложений - vk.com/crosscanon
 
-## Спасибо за вклад в проект:
+## Контрибьюторы (Спасибо за ваш вклад!)
 
-<a href="github.com">
-  <img src="contrib.rocks" />
-</a>
+[![Contributors](https://contrib.rocks/image?repo=CrossCanon/snowman_scx)](https://github.com/CrossCanon/snowman_scx/graphs/contributors)

@@ -1196,6 +1196,7 @@
 			</div>
 		</div>
 	</div>
+    <div class="export-import-overlay" id="export-import-overlay"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -1270,6 +1271,7 @@
             
             // Инициализация игрового поля
             function initGameBoard() {
+                // 1. Быстрый сброс состояния
                 gameBoard = [];
                 emptyCells = [];
                 possibleGoldCells = [];
@@ -1277,12 +1279,9 @@
                 nextMoveMode = false;
                 nextMoveHintCell = null;
                 
-                outlineModeBtn.classList.remove('active');
-                nextMoveBtn.classList.remove('active');
-                
-                // Создаем массив игрового поля 5×6
+                // 2. Создаем массив быстро
                 for (let row = 0; row < rows; row++) {
-                    gameBoard[row] = [];
+                    gameBoard[row] = new Array(cols);
                     for (let col = 0; col < cols; col++) {
                         gameBoard[row][col] = {
                             state: CELL_STATES.UNKNOWN,
@@ -1296,16 +1295,87 @@
                     }
                 }
                 
-                // Обновляем отображение
-                renderGameBoard();
-                updateCounters();
-                updateNextMoveHint();
+                // 3. МИНИМАЛЬНЫЙ рендеринг (без анализа процентов)
+                renderGameBoardFast();
                 
+                // 4. Тяжелые вычисления - после
+                requestIdleCallback(() => {
+                    analyzeBoard();
+                    updateCounters();
+                    if (nextMoveMode) updateNextMoveHint();
+                    // Полный рендеринг с процентами
+                    renderGameBoardFull();
+                }, {timeout: 500});
+
                 // Инициализируем предпросмотры тактик
                 initTacticPreviews();
-                
-                // Добавляем обработчики кликов на карточки тактик
+
+                // Настраиваем обработчики создания предпросмотров
                 setupTacticCards();
+            }
+
+            function renderGameBoardFast() {
+                // Быстрый рендеринг без сложных вычислений
+                const fragment = document.createDocumentFragment();
+                
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const cell = gameBoard[row][col];
+                        const cellElement = document.createElement('div');
+                        
+                        // Только базовые классы
+                        let cellClass = `cell ${cell.state}`;
+                        if (cell.hasGoldOutline) cellClass += ' gold-outline';
+                        if (nextMoveMode && cell.isRecommended) cellClass += ' next-move-hint';
+                        
+                        cellElement.className = cellClass;
+                        cellElement.textContent = cell.state === CELL_STATES.GOLD ? '★' : '';
+                        
+                        // Координаты
+                        const cellNumber = document.createElement('div');
+                        cellNumber.className = 'cell-number';
+                        cellNumber.textContent = `${row+1},${col+1}`;
+                        cellElement.appendChild(cellNumber);
+                        
+                        // НЕТ процентов на этом этапе!
+                        
+                        cellElement.addEventListener('click', () => handleCellClick(row, col));
+                        fragment.appendChild(cellElement);
+                    }
+                }
+                
+                gameBoardElement.innerHTML = '';
+                gameBoardElement.appendChild(fragment);
+            }
+
+            function renderGameBoardFull() {
+                // Полный рендеринг с процентами (вызывается позже)
+                const cells = gameBoardElement.children;
+                
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const cell = gameBoard[row][col];
+                        const cellElement = cells[row * cols + col];
+                        
+                        // Добавляем проценты если нужно
+                        if (cell.goldChance > 0 && cell.state === CELL_STATES.UNKNOWN) {
+                            // Удаляем старые проценты
+                            const oldChance = cellElement.querySelector('.gold-chance');
+                            if (oldChance) oldChance.remove();
+                            
+                            // Добавляем новые
+                            const chanceElement = document.createElement('div');
+                            chanceElement.className = 'gold-chance';
+                            chanceElement.classList.add(cell.goldChance >= 50 ? 'high' : 'low');
+                            chanceElement.textContent = `${Math.round(cell.goldChance)}%`;
+                            cellElement.appendChild(chanceElement);
+                        } else {
+                            // Убираем проценты если не нужны
+                            const oldChance = cellElement.querySelector('.gold-chance');
+                            if (oldChance) oldChance.remove();
+                        }
+                    }
+                }
             }
 
 			const devBanner = document.getElementById('dev-banner');
@@ -1332,6 +1402,14 @@
                 let bestCell = null;
                 let bestScore = -Infinity;
                 
+                // ОПТИМИЗАЦИЯ: Получаем общие данные один раз
+                const totalCells = rows * cols;
+                const unknownCount = countUnknownCells();
+                const unknownPercentage = (unknownCount / totalCells) * 100;
+                
+                // Определяем, стоит ли использовать бонус за алмазную формацию
+                const useDiamondBonus = shouldContinueFormation(DIAMOND_FORMATION);
+                
                 // Сбрасываем все флаги
                 for (let row = 0; row < rows; row++) {
                     for (let col = 0; col < cols; col++) {
@@ -1339,180 +1417,35 @@
                         gameBoard[row][col].infoValue = 0;
                     }
                 }
-				
-				// ПРИОРИТЕТ 1: Клетки между двумя контурами (потенциальная триангуляция)
-				for (let row = 0; row < rows; row++) {
-					for (let col = 0; col < cols; col++) {
-						const cell = gameBoard[row][col];
-						if (cell.state !== CELL_STATES.UNKNOWN) continue;
-						if (emptyCells.some(ec => ec.row === row && ec.col === col)) continue;
-						
-						// Проверяем, сколько контуров вокруг
-						const neighbors = getAdjacentCells(row, col);
-						let outlineCount = 0;
-						
-						neighbors.forEach(neighbor => {
-							if (gameBoard[neighbor.row][neighbor.col].hasGoldOutline) {
-								outlineCount++;
-							}
-						});
-						
-						if (outlineCount >= 2) {
-							// Это клетка между контурами - ВЫСОКИЙ ПРИОРИТЕТ
-							const score = 150 + calculateInformationValue(row, col);
-							if (score > bestScore) {
-								bestScore = score;
-								bestCell = {row, col, score};
-							}
-						}
-					}
-				}
-				
-				// ШАГ 0: ПРОВЕРКА НА ПРИНУДИТЕЛЬНОЕ ЗОЛОТО
-				// Ищем клетки, которые ДОЛЖНЫ быть золотыми по логике
-				const outlineCells = [];
-				for (let row = 0; row < rows; row++) {
-					for (let col = 0; col < cols; col++) {
-						if (gameBoard[row][col].hasGoldOutline) {
-							outlineCells.push({row, col});
-						}
-					}
-				}
-
-				for (const outline of outlineCells) {
-					const neighbors = getAdjacentCells(outline.row, outline.col);
-					
-					let goldCount = 0;
-					let unknownNeighbors = [];
-					
-					neighbors.forEach(neighbor => {
-						const cell = gameBoard[neighbor.row][neighbor.col];
-						if (cell.state === CELL_STATES.GOLD) {
-							goldCount++;
-						} else if (cell.state === CELL_STATES.UNKNOWN && 
-								  !emptyCells.some(ec => ec.row === neighbor.row && ec.col === neighbor.col)) {
-							unknownNeighbors.push(neighbor);
-						}
-					});
-					
-					// Если у контура еще не найдено золото и остался только один неизвестный сосед
-					if (goldCount === 0 && unknownNeighbors.length === 1) {
-						const forcedGold = unknownNeighbors[0];
-						// Это клетка ДОЛЖНА быть золотой - максимальный приоритет
-						bestCell = {row: forcedGold.row, col: forcedGold.col, score: 200};
-						return bestCell;
-					}
-				}
                 
-                // ШАГ 1: ПРОВЕРКА НА НАЧАЛО ИГРЫ
-                const unknownCount = countUnknownCells();
-                if (unknownCount === rows * cols) {
-                    // Самая первая игра - предлагаем первую клетку алмазной формации
-                    bestCell = {row: DIAMOND_FORMATION[0].row, col: DIAMOND_FORMATION[0].col, score: 100};
-                    return bestCell;
-                }
-                
-                // ШАГ 2: ЕСТЬ ЛИ НЕЗАВЕРШЕННАЯ АЛМАЗНАЯ ФОРМАЦИЯ?
-                let unfinishedDiamondCells = [];
-                for (const pos of DIAMOND_FORMATION) {
-                    const cell = gameBoard[pos.row][pos.col];
-                    if (cell.state === CELL_STATES.UNKNOWN && 
-                        !emptyCells.some(ec => ec.row === pos.row && ec.col === pos.col)) {
-                        unfinishedDiamondCells.push(pos);
-                    }
-                }
-                
-                // Если есть незавершенные клетки алмазной формации, продолжаем её
-                if (unfinishedDiamondCells.length > 0) {
-                    // Выбираем клетку с максимальной информационной ценностью
-                    let bestDiamondCell = null;
-                    let bestDiamondScore = -Infinity;
-                    
-                    for (const pos of unfinishedDiamondCells) {
-                        const score = calculateInformationValue(pos.row, pos.col);
-                        if (score > bestDiamondScore) {
-                            bestDiamondScore = score;
-                            bestDiamondCell = pos;
-                        }
-                    }
-                    
-                    if (bestDiamondCell) {
-                        bestCell = {row: bestDiamondCell.row, col: bestDiamondCell.col, score: 80 + bestDiamondScore};
-                    }
-                }
-                
-                // ШАГ 3: ЕСЛИ НЕТ АЛМАЗНОЙ ФОРМАЦИИ, ИЩЕМ КЛЕТКИ С КОНТУРАМИ
-                if (!bestCell) {
-                    const outlineCells = [];
-                    for (let row = 0; row < rows; row++) {
-                        for (let col = 0; col < cols; col++) {
-                            if (gameBoard[row][col].hasGoldOutline) {
-                                outlineCells.push({row, col});
-                            }
-                        }
-                    }
-                    
-                    // Проверяем контуры на наличие неоткрытых соседей
-                    for (const outline of outlineCells) {
-                        const neighbors = getAdjacentCells(outline.row, outline.col);
-                        let unknownNeighbors = [];
+                // ------------------------------------------------------------
+                // ПРИОРИТЕТ 1: ГАРАНТИРОВАННОЕ ЗОЛОТО (100% шанс)
+                // ------------------------------------------------------------
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const cell = gameBoard[row][col];
+                        if (cell.state !== CELL_STATES.UNKNOWN) continue;
+                        if (emptyCells.some(ec => ec.row === row && ec.col === col)) continue;
                         
-                        neighbors.forEach(neighbor => {
-                            const cell = gameBoard[neighbor.row][neighbor.col];
-                            if (cell.state === CELL_STATES.UNKNOWN && 
-                                !emptyCells.some(ec => ec.row === neighbor.row && ec.col === neighbor.col)) {
-                                unknownNeighbors.push(neighbor);
-                            }
-                        });
-                        
-                        // Если у контура есть неоткрытые соседи
-                        if (unknownNeighbors.length > 0) {
-                            // Проверяем, сколько золота уже найдено у этого контура
-                            let goldCount = 0;
-                            neighbors.forEach(neighbor => {
-                                if (gameBoard[neighbor.row][neighbor.col].state === CELL_STATES.GOLD) {
-                                    goldCount++;
-                                }
-                            });
-                            
-                            // Если у контура уже есть золото, приоритет НИЗКИЙ
-                            if (goldCount > 0) {
-                                // Продолжаем поиск более ценных клеток
-                                continue;
-                            } else {
-                                // Если золота нет, выбираем соседа с максимальной информационной ценностью
-                                let bestNeighbor = null;
-                                let bestNeighborScore = -Infinity;
-                                
-                                for (const neighbor of unknownNeighbors) {
-                                    const score = calculateInformationValue(neighbor.row, neighbor.col);
-                                    if (score > bestNeighborScore) {
-                                        bestNeighborScore = score;
-                                        bestNeighbor = neighbor;
-                                    }
-                                }
-                                
-                                if (bestNeighbor) {
-                                    bestCell = {row: bestNeighbor.row, col: bestNeighbor.col, score: 70 + bestNeighborScore};
-                                    break;
-                                }
-                            }
+                        // Клетки с 95-100% шансом (триангуляция или принудительное золото)
+                        if (cell.goldChance >= 95) {
+                            // Максимальный приоритет - сразу возвращаем
+                            return {row, col, score: 1000};
                         }
                     }
                 }
                 
-                // ШАГ 4: ЕСЛИ НЕ НАШЛИ ЦЕННЫХ КЛЕТОК, ИЩЕМ САМУЮ ИНФОРМАТИВНУЮ
-                if (!bestCell) {
-                    for (let row = 0; row < rows; row++) {
-                        for (let col = 0; col < cols; col++) {
-                            const cell = gameBoard[row][col];
-                            
-                            if (cell.state !== CELL_STATES.UNKNOWN) continue;
-                            if (emptyCells.some(ec => ec.row === row && ec.col === col)) continue;
-                            
-                            const infoValue = calculateInformationValue(row, col);
-                            const score = infoValue;
-                            
+                // ------------------------------------------------------------
+                // ПРИОРИТЕТ 2: ОЧЕНЬ ВЫСОКИЙ ШАНС (>80%)
+                // ------------------------------------------------------------
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const cell = gameBoard[row][col];
+                        if (cell.state !== CELL_STATES.UNKNOWN) continue;
+                        if (emptyCells.some(ec => ec.row === row && ec.col === col)) continue;
+                        
+                        if (cell.goldChance >= 80) {
+                            const score = 500 + cell.goldChance; // 580-599
                             if (score > bestScore) {
                                 bestScore = score;
                                 bestCell = {row, col, score};
@@ -1521,14 +1454,56 @@
                     }
                 }
                 
-                // ШАГ 5: ОСОБЫЙ СЛУЧАЙ - ТРИАНГУЛЯЦИЯ (МАКСИМАЛЬНЫЙ ПРИОРИТЕТ)
-                // Ищем клетки между двумя контурами
+                if (bestCell) return bestCell;
+                
+                // ------------------------------------------------------------
+                // ПРИОРИТЕТ 3: ПРИНУДИТЕЛЬНОЕ ЗОЛОТО (логический вывод)
+                // ------------------------------------------------------------
+                // Проверяем все контуры - если у контура остался только один неизвестный сосед
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        if (gameBoard[row][col].hasGoldOutline) {
+                            const neighbors = getAdjacentCells(row, col);
+                            
+                            let goldCount = 0;
+                            let unknownNeighbors = [];
+                            
+                            neighbors.forEach(neighbor => {
+                                const cell = gameBoard[neighbor.row][neighbor.col];
+                                if (cell.state === CELL_STATES.GOLD) {
+                                    goldCount++;
+                                } else if (cell.state === CELL_STATES.UNKNOWN && 
+                                        !emptyCells.some(ec => ec.row === neighbor.row && ec.col === neighbor.col)) {
+                                    unknownNeighbors.push(neighbor);
+                                }
+                            });
+                            
+                            // Если у контура еще не найдено золото и остался только один неизвестный сосед
+                            if (goldCount === 0 && unknownNeighbors.length === 1) {
+                                const forcedGold = unknownNeighbors[0];
+                                // Приоритет чуть ниже 100% шанса, но выше обычных клеток
+                                const score = 450;
+                                if (score > bestScore) {
+                                    bestScore = score;
+                                    bestCell = {row: forcedGold.row, col: forcedGold.col, score};
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if (bestCell) return bestCell;
+                
+                // ------------------------------------------------------------
+                // ПРИОРИТЕТ 4: КЛЕТКИ МЕЖДУ ДВУМЯ КОНТУРАМИ (потенциальная триангуляция)
+                // ------------------------------------------------------------
                 for (let row = 0; row < rows; row++) {
                     for (let col = 0; col < cols; col++) {
                         const cell = gameBoard[row][col];
                         if (cell.state !== CELL_STATES.UNKNOWN) continue;
                         if (emptyCells.some(ec => ec.row === row && ec.col === col)) continue;
                         
+                        // Проверяем, сколько контуров вокруг
                         const neighbors = getAdjacentCells(row, col);
                         let outlineCount = 0;
                         
@@ -1539,83 +1514,355 @@
                         });
                         
                         if (outlineCount >= 2) {
-                            // Триангуляция - максимальный приоритет
-                            bestCell = {row, col, score: 200};
-                            break;
+                            // Это клетка между контурами - высокая вероятность золота
+                            const score = 400 + calculateInformationValue(row, col, useDiamondBonus);
+                            if (score > bestScore) {
+                                bestScore = score;
+                                bestCell = {row, col, score};
+                            }
                         }
                     }
-                    if (bestCell && bestCell.score === 200) break;
+                }
+                
+                if (bestCell) return bestCell;
+                
+                // ------------------------------------------------------------
+                // ПРИОРИТЕТ 5: НАЧАЛО ИГРЫ - АЛМАЗНАЯ ФОРМАЦИЯ
+                // ------------------------------------------------------------
+                if (unknownCount === totalCells) {
+                    // Самая первая игра - предлагаем первую клетку алмазной формации
+                    bestCell = {row: DIAMOND_FORMATION[0].row, col: DIAMOND_FORMATION[0].col, score: 100};
+                    return bestCell;
+                }
+                
+                // ------------------------------------------------------------
+                // ПРИОРИТЕТ 6: ЗАВЕРШЕНИЕ АЛМАЗНОЙ ФОРМАЦИИ (если начали)
+                // ------------------------------------------------------------
+                let startedDiamondFormation = 0;
+                for (const pos of DIAMOND_FORMATION) {
+                    const cell = gameBoard[pos.row][pos.col];
+                    if (cell.state !== CELL_STATES.UNKNOWN || cell.hasGoldOutline) {
+                        startedDiamondFormation++;
+                    }
+                }
+                
+                // Продолжаем алмазную формацию ТОЛЬКО если уже начали её
+                if (startedDiamondFormation > 0) {
+                    let unfinishedDiamondCells = [];
+                    for (const pos of DIAMOND_FORMATION) {
+                        const cell = gameBoard[pos.row][pos.col];
+                        if ((cell.state === CELL_STATES.UNKNOWN && !cell.hasGoldOutline) || 
+                            (cell.hasGoldOutline)) {
+                            if (!emptyCells.some(ec => ec.row === pos.row && ec.col === pos.col)) {
+                                unfinishedDiamondCells.push(pos);
+                            }
+                        }
+                    }
+                    
+                    // Выбираем лучшую клетку из незавершенных
+                    if (unfinishedDiamondCells.length > 0) {
+                        let bestDiamondCell = null;
+                        let bestDiamondScore = -Infinity;
+                        
+                        for (const pos of unfinishedDiamondCells) {
+                            const cell = gameBoard[pos.row][pos.col];
+                            if (cell.state === CELL_STATES.NORMAL || cell.state === CELL_STATES.GOLD) {
+                                continue; // Пропускаем, если уже обычная или золотая
+                            }
+                            
+                            const score = calculateInformationValue(pos.row, pos.col, useDiamondBonus);
+                            if (score > bestDiamondScore) {
+                                bestDiamondScore = score;
+                                bestDiamondCell = pos;
+                            }
+                        }
+                        
+                        if (bestDiamondCell && bestDiamondScore > 30) {
+                            const finalScore = 300 + bestDiamondScore;
+                            if (finalScore > bestScore) {
+                                bestScore = finalScore;
+                                bestCell = {row: bestDiamondCell.row, col: bestDiamondCell.col, score: finalScore};
+                            }
+                        }
+                    }
+                }
+                
+                if (bestCell) return bestCell;
+                
+                // ------------------------------------------------------------
+                // ПРИОРИТЕТ 7: КЛЕТКИ РЯДОМ С КОНТУРАМИ (у которых нет золота)
+                // ------------------------------------------------------------
+                const outlineCells = [];
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        if (gameBoard[row][col].hasGoldOutline) {
+                            outlineCells.push({row, col});
+                        }
+                    }
+                }
+                
+                for (const outline of outlineCells) {
+                    const neighbors = getAdjacentCells(outline.row, outline.col);
+                    let unknownNeighbors = [];
+                    
+                    neighbors.forEach(neighbor => {
+                        const cell = gameBoard[neighbor.row][neighbor.col];
+                        if (cell.state === CELL_STATES.UNKNOWN && 
+                            !emptyCells.some(ec => ec.row === neighbor.row && ec.col === neighbor.col)) {
+                            unknownNeighbors.push(neighbor);
+                        }
+                    });
+                    
+                    // Если у контура есть неоткрытые соседи
+                    if (unknownNeighbors.length > 0) {
+                        // Проверяем, сколько золота уже найдено у этого контура
+                        let goldCount = 0;
+                        neighbors.forEach(neighbor => {
+                            if (gameBoard[neighbor.row][neighbor.col].state === CELL_STATES.GOLD) {
+                                goldCount++;
+                            }
+                        });
+                        
+                        // Если у контура уже есть золото, приоритет НИЗКИЙ
+                        if (goldCount > 0) {
+                            continue;
+                        }
+                        
+                        // Если золота нет, выбираем лучшего соседа
+                        let bestNeighbor = null;
+                        let bestNeighborScore = -Infinity;
+                        
+                        for (const neighbor of unknownNeighbors) {
+                            const score = calculateInformationValue(neighbor.row, neighbor.col, useDiamondBonus);
+                            if (score > bestNeighborScore) {
+                                bestNeighborScore = score;
+                                bestNeighbor = neighbor;
+                            }
+                        }
+                        
+                        if (bestNeighbor) {
+                            const finalScore = 200 + bestNeighborScore;
+                            if (finalScore > bestScore) {
+                                bestScore = finalScore;
+                                bestCell = {row: bestNeighbor.row, col: bestNeighbor.col, score: finalScore};
+                            }
+                        }
+                    }
+                }
+                
+                if (bestCell) return bestCell;
+                
+                // ------------------------------------------------------------
+                // ПРИОРИТЕТ 8: ПРИОРИТЕТ ЦЕНТРАЛЬНЫХ КЛЕТОК (если много неизвестных)
+                // ------------------------------------------------------------
+                if (unknownPercentage > 70) {
+                    for (let row = 0; row < rows; row++) {
+                        for (let col = 0; col < cols; col++) {
+                            const cell = gameBoard[row][col];
+                            if (cell.state !== CELL_STATES.UNKNOWN) continue;
+                            if (emptyCells.some(ec => ec.row === row && ec.col === col)) continue;
+                            
+                            // Особый бонус для центральных клеток при пустом поле
+                            if (row >= 1 && row <= 3 && col >= 1 && col <= 4) {
+                                const score = calculatePureInformationValue(row, col) + 100; // Бонус
+                                if (score > bestScore) {
+                                    bestScore = score;
+                                    bestCell = {row, col, score};
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (bestCell) return bestCell;
+                }
+                
+                // ------------------------------------------------------------
+                // ПРИОРИТЕТ 9: САМАЯ ИНФОРМАТИВНАЯ КЛЕТКА (последний вариант)
+                // ------------------------------------------------------------
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const cell = gameBoard[row][col];
+                        if (cell.state !== CELL_STATES.UNKNOWN) continue;
+                        if (emptyCells.some(ec => ec.row === row && ec.col === col)) continue;
+                        
+                        const infoValue = calculateInformationValue(row, col, useDiamondBonus);
+                        const score = infoValue;
+                        
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestCell = {row, col, score};
+                        }
+                    }
                 }
                 
                 return bestCell;
             }
             
             // Расчет информационной ценности клетки
-			function calculateInformationValue(row, col) {
-				let infoValue = 0;
-				const neighbors = getAdjacentCells(row, col);
-				
-				// Базовое значение: сколько соседей мы узнаем
-				let unknownNeighbors = 0;
-				neighbors.forEach(neighbor => {
-					const cell = gameBoard[neighbor.row][neighbor.col];
-					if (cell.state === CELL_STATES.UNKNOWN && 
-						!emptyCells.some(ec => ec.row === neighbor.row && ec.col === neighbor.col)) {
-						unknownNeighbors++;
-					}
-				});
-				
-				infoValue += unknownNeighbors * 15;
-				
-				// Бонус за центральное положение (максимум информации)
-				const neighborCount = neighbors.length;
-				if (neighborCount === 4) infoValue += 20;       // Центр
-				else if (neighborCount === 3) infoValue += 10;  // Край
-				else if (neighborCount === 2) infoValue -= 10;  // Угол
-				
-				// Штраф за клетки рядом с уже найденным золотом
-				let goldNeighbors = 0;
-				neighbors.forEach(neighbor => {
-					if (gameBoard[neighbor.row][neighbor.col].state === CELL_STATES.GOLD) {
-						goldNeighbors++;
-					}
-				});
-				
-				infoValue -= goldNeighbors * 25;
-				
-				// Бонус за клетки рядом с контурами (если у них нет золота)
-				let outlineNeighborCount = 0; // ИЗМЕНИЛИ ИМЯ ПЕРЕМЕННОЙ
-				neighbors.forEach(neighbor => {
-					if (gameBoard[neighbor.row][neighbor.col].hasGoldOutline) {
-						// Проверяем, есть ли у этого контура уже золото
-						const outlineAdjacentCells = getAdjacentCells(neighbor.row, neighbor.col); // ИЗМЕНИЛИ ИМЯ ПЕРЕМЕННОЙ
-						let hasGold = false;
-						outlineAdjacentCells.forEach(n => {
-							if (gameBoard[n.row][n.col].state === CELL_STATES.GOLD) {
-								hasGold = true;
-							}
-						});
-						if (!hasGold) {
-							outlineNeighborCount++; // ИСПОЛЬЗУЕМ НОВОЕ ИМЯ
-						}
-					}
-				});
-				
-				infoValue += outlineNeighborCount * 10; // ИСПОЛЬЗУЕМ НОВОЕ ИМЯ
-				
-				// Бонус за клетки, которые могут завершить алмазную формацию
-				for (const pos of DIAMOND_FORMATION) {
-					if (pos.row === row && pos.col === col) {
-						infoValue += 30;
-						break;
-					}
-				}
-				
-				// Сохраняем значение для отладки
-				gameBoard[row][col].infoValue = infoValue;
-				
-				return infoValue;
-			}
+			function calculateInformationValue(row, col, useDiamondBonus = false) {
+                let infoValue = 0;
+                const neighbors = getAdjacentCells(row, col);
+                
+                // 1. Считаем НОВУЮ информацию (неизвестные соседи)
+                let newUnknownNeighbors = 0;
+                neighbors.forEach(neighbor => {
+                    const cell = gameBoard[neighbor.row][neighbor.col];
+                    // Только если клетка неизвестна И не помечена как пустая
+                    if (cell.state === CELL_STATES.UNKNOWN && 
+                        !emptyCells.some(ec => ec.row === neighbor.row && ec.col === neighbor.col)) {
+                        newUnknownNeighbors++;
+                    }
+                });
+                
+                infoValue += newUnknownNeighbors * 25; // Больше очков за новую информацию
+                
+                // 2. Бонус за центральное положение
+                const neighborCount = neighbors.length;
+                if (neighborCount === 4) infoValue += 20;
+                else if (neighborCount === 3) infoValue += 10;
+                else if (neighborCount === 2) infoValue -= 15; // Больший штраф за углы
+                
+                // 3. Штраф за клетки рядом с уже найденным золотом
+                let goldNeighbors = 0;
+                neighbors.forEach(neighbor => {
+                    if (gameBoard[neighbor.row][neighbor.col].state === CELL_STATES.GOLD) {
+                        goldNeighbors++;
+                    }
+                });
+                
+                infoValue -= goldNeighbors * 30;
+                
+                // 4. Бонус за клетки рядом с контурами (у которых нет золота)
+                let outlineNeighborCount = 0;
+                neighbors.forEach(neighbor => {
+                    if (gameBoard[neighbor.row][neighbor.col].hasGoldOutline) {
+                        const outlineAdjacentCells = getAdjacentCells(neighbor.row, neighbor.col);
+                        let hasGold = false;
+                        outlineAdjacentCells.forEach(n => {
+                            if (gameBoard[n.row][n.col].state === CELL_STATES.GOLD) {
+                                hasGold = true;
+                            }
+                        });
+                        if (!hasGold) {
+                            outlineNeighborCount++;
+                        }
+                    }
+                });
+                
+                infoValue += outlineNeighborCount * 12;
+                
+                // 5. ОСОБЫЙ БОНУС: если клетка даст информацию о ВЕРХНЕЙ ЧАСТИ поля
+                // (верхние строки часто менее исследованы)
+                if (row <= 1) { // Верхние 2 строки
+                    infoValue += 25;
+                }
+                
+                // 6. ШТРАФ: если многие соседи уже известны как пустые
+                let knownEmptyNeighbors = 0;
+                neighbors.forEach(neighbor => {
+                    if (emptyCells.some(ec => ec.row === neighbor.row && ec.col === neighbor.col)) {
+                        knownEmptyNeighbors++;
+                    }
+                });
+                
+                infoValue -= knownEmptyNeighbors * 20; // Штраф за "бесполезных" соседей
+                
+                // 7. Бонус за алмазную формацию
+                if (useDiamondBonus) {
+                    for (const pos of DIAMOND_FORMATION) {
+                        if (pos.row === row && pos.col === col) {
+                            infoValue += 30;
+                            break;
+                        }
+                    }
+                }
+                
+                return infoValue;
+            }
+
+            function calculatePureInformationValue(row, col) {
+                const neighbors = getAdjacentCells(row, col);
+                
+                // 1. Количество соседей (основной фактор)
+                let score = neighbors.length * 20; // 20 баллов за каждого соседа
+                
+                // 2. Положение на поле
+                if (neighbors.length === 4) score += 30; // Центр - максимальный бонус
+                else if (neighbors.length === 3) score += 10; // Край
+                else if (neighbors.length === 2) score -= 20; // Угол - штраф
+                
+                // 3. Сколько новых клеток узнаем
+                let newInfo = 0;
+                neighbors.forEach(neighbor => {
+                    if (gameBoard[neighbor.row][neighbor.col].state === CELL_STATES.UNKNOWN) {
+                        newInfo++;
+                    }
+                });
+                score += newInfo * 15;
+                
+                // 4. Бонус за отдаленность от уже открытых клеток
+                // (чтобы исследовать новые зоны)
+                let distanceFromKnown = 0;
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        if (gameBoard[r][c].state !== CELL_STATES.UNKNOWN) {
+                            const distance = Math.abs(r - row) + Math.abs(c - col);
+                            distanceFromKnown += distance;
+                        }
+                    }
+                }
+                score += distanceFromKnown * 0.5;
+                
+                return score;
+            }
+
+            // ФУНКЦИЯ: Определяет, стоит ли продолжать формацию
+            function shouldContinueFormation(formationCells) {
+            let formationOpened = 0;
+            let otherNormalCells = 0;
+            
+            // Считаем сколько клеток формации открыто как NORMAL, GOLD ИЛИ имеют золотой контур
+            for (const pos of formationCells) {
+                const cell = gameBoard[pos.row][pos.col];
+                if (cell.state === CELL_STATES.NORMAL || cell.state === CELL_STATES.GOLD || cell.hasGoldOutline) {
+                    formationOpened++;
+                }
+            }
+            
+            // Считаем сколько ДРУГИХ клеток открыто как NORMAL, GOLD или имеют контур
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    // Пропускаем клетки формации
+                    const isFormationCell = formationCells.some(pos => 
+                        pos.row === row && pos.col === col);
+                    
+                    if (!isFormationCell) {
+                        const cell = gameBoard[row][col];
+                        if (cell.state === CELL_STATES.NORMAL || cell.state === CELL_STATES.GOLD || cell.hasGoldOutline) {
+                            otherNormalCells++;
+                        }
+                    }
+                }
+            }
+            
+            // Если формация не начата (0 клеток) → можно начать
+            if (formationOpened === 0) {
+                return true;
+            }
+            
+            // Если открыли значительно больше других клеток → переключиться
+            if (otherNormalCells > formationOpened * 1.5) {
+                return false;
+            }
+            
+            // Если уже нашли 3-4 клетки формации → продолжать
+            if (formationOpened >= 3) {
+                return true;
+            }
+            
+            // По умолчанию продолжаем, если начали
+            return formationOpened > 0;
+        }
             
             // Подсчет неизвестных клеток
             function countUnknownCells() {
@@ -1802,7 +2049,7 @@
                         cell.className = 'preview-cell';
                         
                         const isStart = (row === 1 && col === 1) || (row === 1 && col === 4) || 
-                                       (row === 3 && col === 1) || (row === 3 && col === 4);
+                                    (row === 3 && col === 1) || (row === 3 && col === 4);
                         
                         if (isStart) {
                             cell.style.backgroundColor = '#a3e4d7';
@@ -2378,6 +2625,7 @@
                             cellClass = `cell ${CELL_STATES.GOLD}`;
                         } else if (isEmpty && cell.state === CELL_STATES.UNKNOWN) {
                             cellClass = `cell ${CELL_STATES.EMPTY}`;
+                            cellElement.textContent = '';
                         } else if (isPossibleGold && cell.state === CELL_STATES.UNKNOWN) {
                             cellClass = `cell ${CELL_STATES.POSSIBLE_GOLD}`;
                         } else if (cell.state === CELL_STATES.NORMAL) {
@@ -2402,6 +2650,7 @@
                         }
                         
                         if (cell.state === CELL_STATES.GOLD) {
+                            cellClass = `cell ${CELL_STATES.GOLD}`;
                             cellElement.textContent = '★';
                         }
                         
@@ -2431,15 +2680,18 @@
                 const cell = gameBoard[row][col];
                 
                 if (outlineMode) {
+                    // Режим контуров: ТОЛЬКО переключаем контур
                     cell.hasGoldOutline = !cell.hasGoldOutline;
                 } else {
+                    // Обычный режим: меняем ТОЛЬКО состояние, контур НЕ трогаем
                     if (cell.state === CELL_STATES.UNKNOWN) {
                         cell.state = CELL_STATES.NORMAL;
                     } else if (cell.state === CELL_STATES.NORMAL) {
                         cell.state = CELL_STATES.GOLD;
-                    } else {
+                    } else if (cell.state === CELL_STATES.GOLD) {
                         cell.state = CELL_STATES.UNKNOWN;
                     }
+                    // Если cell.state === CELL_STATES.EMPTY или другие - оставляем как есть
                 }
                 
                 analyzeBoard();
@@ -2459,26 +2711,29 @@
 					}
 				}
 				
-				// ШАГ 1: ПУСТЫЕ СОСЕДИ ОБЫЧНЫХ КЛЕТОК БЕЗ КОНТУРОВ
-				for (let row = 0; row < rows; row++) {
-					for (let col = 0; col < cols; col++) {
-						const cell = gameBoard[row][col];
-						
-						if (cell.state === CELL_STATES.NORMAL && !cell.hasGoldOutline) {
-							const neighbors = getAdjacentCells(row, col);
-							
-							neighbors.forEach(neighbor => {
-								const neighborCell = gameBoard[neighbor.row][neighbor.col];
-								
-								if (neighborCell.state === CELL_STATES.UNKNOWN) {
-									if (!emptyCells.some(c => c.row === neighbor.row && c.col === neighbor.col)) {
-										emptyCells.push({row: neighbor.row, col: neighbor.col});
-									}
-								}
-							});
-						}
-					}
-				}
+				// ШАГ 1: ПУСТЫЕ СОСЕДИ КЛЕТОК БЕЗ КОНТУРОВ
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const cell = gameBoard[row][col];
+                        
+                        // Если это ОБЫЧНАЯ или ЗОЛОТАЯ клетка БЕЗ контура
+                        if ((cell.state === CELL_STATES.NORMAL || cell.state === CELL_STATES.GOLD) && 
+                            !cell.hasGoldOutline) {
+                            const neighbors = getAdjacentCells(row, col);
+                            
+                            neighbors.forEach(neighbor => {
+                                const neighborCell = gameBoard[neighbor.row][neighbor.col];
+                                
+                                // Если сосед неизвестен и не золотой
+                                if (neighborCell.state === CELL_STATES.UNKNOWN) {
+                                    if (!emptyCells.some(c => c.row === neighbor.row && c.col === neighbor.col)) {
+                                        emptyCells.push({row: neighbor.row, col: neighbor.col});
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
 				
 				// ШАГ 2: СОБИРАЕМ КЛЕТКИ С КОНТУРАМИ
 				const outlineCells = [];
@@ -2608,66 +2863,72 @@
 				
 				// ШАГ 5: ТРИАНГУЛЯЦИЯ (МАКСИМАЛЬНЫЙ ШАНС)
 				for (let i = 0; i < outlineCells.length; i++) {
-					for (let j = i + 1; j < outlineCells.length; j++) {
-						const cell1 = outlineCells[i];
-						const cell2 = outlineCells[j];
-						
-						// Проверяем все возможные клетки между контурами
-						// Горизонтальное соседство
-						if (cell1.row === cell2.row && Math.abs(cell1.col - cell2.col) === 2) {
-							const middleCol = Math.min(cell1.col, cell2.col) + 1;
-							const middleRow = cell1.row;
-							
-							if (isValidCell(middleRow, middleCol) && 
-								gameBoard[middleRow][middleCol].state === CELL_STATES.UNKNOWN) {
-								const key = `${middleRow},${middleCol}`;
-								goldChanceMap.set(key, {
-									row: middleRow,
-									col: middleCol,
-									chance: 95 // Максимальный шанс для триангуляции
-								});
-							}
-						}
-						
-						// Вертикальное соседство
-						if (cell1.col === cell2.col && Math.abs(cell1.row - cell2.row) === 2) {
-							const middleRow = Math.min(cell1.row, cell2.row) + 1;
-							const middleCol = cell1.col;
-							
-							if (isValidCell(middleRow, middleCol) && 
-								gameBoard[middleRow][middleCol].state === CELL_STATES.UNKNOWN) {
-								const key = `${middleRow},${middleCol}`;
-								goldChanceMap.set(key, {
-									row: middleRow,
-									col: middleCol,
-									chance: 95
-								});
-							}
-						}
-						
-						// Диагональное соседство
-						if (Math.abs(cell1.row - cell2.row) === 1 && Math.abs(cell1.col - cell2.col) === 1) {
-							// Клетка, которая соседствует с обоими контурами
-							const possibleCells = [
-								{row: cell1.row, col: cell2.col},
-								{row: cell2.row, col: cell1.col}
-							];
-							
-							possibleCells.forEach(pos => {
-								if (isValidCell(pos.row, pos.col) && 
-									gameBoard[pos.row][pos.col].state === CELL_STATES.UNKNOWN) {
-									const key = `${pos.row},${pos.col}`;
-									const existingChance = goldChanceMap.has(key) ? goldChanceMap.get(key).chance : 0;
-									goldChanceMap.set(key, {
-										row: pos.row,
-										col: pos.col,
-										chance: Math.max(existingChance, 80) // Высокий шанс
-									});
-								}
-							});
-						}
-					}
-				}
+                    for (let j = i + 1; j < outlineCells.length; j++) {
+                        const cell1 = outlineCells[i];
+                        const cell2 = outlineCells[j];
+                        
+                        // Проверяем все возможные клетки между контурами
+                        // Горизонтальное соседство
+                        if (cell1.row === cell2.row && Math.abs(cell1.col - cell2.col) === 2) {
+                            const middleCol = Math.min(cell1.col, cell2.col) + 1;
+                            const middleRow = cell1.row;
+                            
+                            // ИСПРАВЛЕННАЯ СТРОКА - добавлена проверка hasGoldOutline
+                            if (isValidCell(middleRow, middleCol) && 
+                                gameBoard[middleRow][middleCol].state === CELL_STATES.UNKNOWN &&
+                                !gameBoard[middleRow][middleCol].hasGoldOutline) {
+                                const key = `${middleRow},${middleCol}`;
+                                goldChanceMap.set(key, {
+                                    row: middleRow,
+                                    col: middleCol,
+                                    chance: 95 // Максимальный шанс для триангуляции
+                                });
+                            }
+                        }
+                        
+                        // Вертикальное соседство
+                        if (cell1.col === cell2.col && Math.abs(cell1.row - cell2.row) === 2) {
+                            const middleRow = Math.min(cell1.row, cell2.row) + 1;
+                            const middleCol = cell1.col;
+                            
+                            // ИСПРАВЛЕННАЯ СТРОКА
+                            if (isValidCell(middleRow, middleCol) && 
+                                gameBoard[middleRow][middleCol].state === CELL_STATES.UNKNOWN &&
+                                !gameBoard[middleRow][middleCol].hasGoldOutline) {
+                                const key = `${middleRow},${middleCol}`;
+                                goldChanceMap.set(key, {
+                                    row: middleRow,
+                                    col: middleCol,
+                                    chance: 95
+                                });
+                            }
+                        }
+                        
+                        // Диагональное соседство
+                        if (Math.abs(cell1.row - cell2.row) === 1 && Math.abs(cell1.col - cell2.col) === 1) {
+                            // Клетка, которая соседствует с обоими контурами
+                            const possibleCells = [
+                                {row: cell1.row, col: cell2.col},
+                                {row: cell2.row, col: cell1.col}
+                            ];
+                            
+                            possibleCells.forEach(pos => {
+                                // ИСПРАВЛЕННАЯ СТРОКА - используем pos.row и pos.col
+                                if (isValidCell(pos.row, pos.col) && 
+                                    gameBoard[pos.row][pos.col].state === CELL_STATES.UNKNOWN &&
+                                    !gameBoard[pos.row][pos.col].hasGoldOutline) {
+                                    const key = `${pos.row},${pos.col}`;
+                                    const existingChance = goldChanceMap.has(key) ? goldChanceMap.get(key).chance : 0;
+                                    goldChanceMap.set(key, {
+                                        row: pos.row,
+                                        col: pos.col,
+                                        chance: Math.max(existingChance, 80) // Высокий шанс
+                                    });
+                                }
+                            });
+                        }
+                    }
+                }
 				
 				// ШАГ 6: ПРИМЕНЯЕМ ПРИНУДИТЕЛЬНОЕ ЗОЛОТО (100% ШАНС)
 				forcedGoldCells.forEach(forcedGold => {
@@ -2812,7 +3073,7 @@
         });
     </script>
 	<!-- Cloudflare Web Analytics -->
-	<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "2e3bf359d7ec48b5b643105f92866e55"}'></script>
+	<!-- <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "2e3bf359d7ec48b5b643105f92866e55"}'></script> -->
 	<!-- End Cloudflare Web Analytics -->
 </body>
 </html>

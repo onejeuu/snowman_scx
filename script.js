@@ -113,6 +113,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Настраиваем обработчики создания предпросмотров
     setupTacticCards();
+
+    // Отключаем ПКМ на фоне игрового поля
+    gameBoardElement.addEventListener("contextmenu", (e) => {
+      if (e.target === gameBoardElement) {
+        e.preventDefault();
+        return;
+      }
+    });
   }
 
   function renderGameBoardFast() {
@@ -141,6 +149,12 @@ document.addEventListener("DOMContentLoaded", function () {
         // НЕТ процентов на этом этапе!
 
         cellElement.addEventListener("click", () => handleCellClick(row, col));
+        cellElement.addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleCellClick(row, col, true);
+        });
+
         fragment.appendChild(cellElement);
       }
     }
@@ -1473,16 +1487,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
         cellElement.addEventListener("click", () => handleCellClick(row, col));
 
+        cellElement.addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleCellClick(row, col, true);
+        });
+
         gameBoardElement.appendChild(cellElement);
       }
     }
   }
 
   // Обработка клика по клетке
-  function handleCellClick(row, col) {
+  function handleCellClick(row, col, isRightClick = false) {
     const cell = gameBoard[row][col];
 
-    if (outlineMode) {
+    if (isRightClick || outlineMode) {
       // Режим контуров: ТОЛЬКО переключаем контур
       cell.hasGoldOutline = !cell.hasGoldOutline;
     } else {

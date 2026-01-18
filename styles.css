@@ -197,11 +197,72 @@ h1 {
 
 /* Нижняя панель с кнопками */
 .bottom-controls {
-  display: flex;
-  justify-content: space-between;
   width: 100%;
-  max-width: 500px;
-  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-new-game-wide {
+  width: 100%;
+  padding: 15px !important;
+  font-size: 1.1rem !important;
+  font-weight: bold;
+  background-color: #27ae60 !important;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 0 #219150;
+  transition: all 0.1s;
+}
+
+.btn-new-game-wide:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #219150;
+}
+
+.secondary-controls {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.secondary-controls .btn {
+  flex: 1;
+  padding: 12px 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  background-color: #ebedef !important;
+  color: #2c3e50 !important;
+  border: 1px solid #d5d8dc;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.secondary-controls .btn:hover {
+  background-color: #d5d8dc !important;
+  border-color: #bdc3c7;
+}
+
+.secondary-controls .btn:active {
+  background-color: #cacfd2 !important;
+  transform: translateY(1px);
+}
+
+.secondary-controls .btn-outline-mode.active {
+  background-color: #fce4bd !important;
+  border-color: #ffa500;
+}
+
+.secondary-controls .btn-next-move.active {
+  background-color: #d4efdf !important;
+  border-color: #27ae60;
 }
 
 .left-controls,
@@ -308,6 +369,19 @@ h1 {
 }
 
 /* Инструкции */
+.instructions-header:hover {
+  opacity: 0.8;
+}
+
+#instructions-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+#instructions-content.collapsed {
+  display: none;
+}
+
 .instructions {
   background-color: #f9f9f9;
   padding: 15px;

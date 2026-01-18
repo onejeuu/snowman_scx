@@ -11,8 +11,6 @@
     <div class="container">
       <header>
         <h1>Помощник для игры "Снеговик"</h1>
-        <p class="subtitle">Автоматический анализ после каждого действия. Помощник не умеет предсказывать.</p>
-        <p class="subtitle">Используйте тактики для максимальной эффективности!</p>
       </header>
 
       <div class="game-area">
@@ -41,55 +39,59 @@
 
         <!-- Нижняя панель с кнопками управления -->
         <div class="bottom-controls">
-          <div class="left-controls">
-            <button class="btn btn-primary btn-with-text" id="new-game-btn">Новая игра</button>
-          </div>
-          <div class="right-controls">
-            <button class="btn btn-secondary" id="export-btn" title="Экспорт/Импорт поля">🛠️</button>
-            <button class="btn btn-outline-mode btn-with-text" id="outline-mode-btn">🔘</button>
-            <button class="btn btn-next-move" id="next-move-btn" title="Подсказка хода">💡</button>
+          <button class="btn btn-primary btn-new-game-wide" id="new-game-btn">Новая игра</button>
+          <div class="secondary-controls">
+            <button class="btn btn-secondary" id="export-btn">🛠️ Данные</button>
+            <button class="btn btn-outline-mode" id="outline-mode-btn">📀 Контуры</button>
+            <button class="btn btn-next-move" id="next-move-btn" title="Подсказка хода">💡 Подсказки</button>
           </div>
         </div>
       </div>
 
       <!-- Инструкции -->
       <div class="instructions">
-        <h3>Как использовать помощник:</h3>
-        <ul>
-          <li>
-            Нажимайте на клетки, чтобы изменить статус: <strong>Неизвестно → Обычная → Золотая → Неизвестно</strong>
-          </li>
-          <li><strong>Кнопка "🔘":</strong> режим установки/снятия золотых контуров</li>
-          <li><strong>Кнопка "💡":</strong> показывает лучший следующий ход (включается/выключается)</li>
-          <li><strong>Кнопки "🛠️":</strong> экспорт и импорт расстановки поля</li>
-          <li><strong>Проценты в клетках:</strong> шанс быть золотой ячейкой</li>
-          <li><strong>Анализ происходит автоматически</strong> после каждого вашего действия</li>
-        </ul>
-
-        <div class="legend">
-          <div class="legend-item">
-            <div class="legend-color" style="background-color: #bdc3c7"></div>
-            <span>Неизвестная</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background-color: #ecf0f1"></div>
-            <span>Обычная</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background-color: #ffd700"></div>
-            <span>Золотая</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background-color: #7f8c8d"></div>
-            <span>Пустая</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="border: 2px solid #ffa500; background-color: #ecf0f1"></div>
-            <span>Золотой контур</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background-color: #27ae60; border: 2px solid #2c3e50"></div>
-            <span>Следующий ход</span>
+        <div
+          class="instructions-header"
+          id="toggle-instructions"
+          style="cursor: pointer; display: flex; justify-content: space-between; align-items: center"
+        >
+          <h3 style="margin: 0">📖 Как использовать помощник</h3>
+          <span id="instructions-icon">▼</span>
+        </div>
+        <div id="instructions-content">
+          <ul>
+            <li>
+              Нажимайте на клетки, чтобы изменить статус: <strong>Неизвестно → Обычная → Золотая → Неизвестно</strong>
+            </li>
+            <li><strong>Кнопка "🔘":</strong> режим установки/снятия золотых контуров</li>
+            <li><strong>Кнопка "💡":</strong> показывает лучший следующий ход</li>
+            <li><strong>Кнопки "🛠️":</strong> экспорт и импорт расстановки поля</li>
+          </ul>
+          <div class="legend">
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #bdc3c7"></div>
+              <span>Неизвестная</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #ecf0f1"></div>
+              <span>Обычная</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #ffd700"></div>
+              <span>Золотая</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #7f8c8d"></div>
+              <span>Пустая</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="border: 2px solid #ffa500; background-color: #ecf0f1"></div>
+              <span>Золотой контур</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #27ae60; border: 2px solid #2c3e50"></div>
+              <span>Следующий ход</span>
+            </div>
           </div>
         </div>
       </div>

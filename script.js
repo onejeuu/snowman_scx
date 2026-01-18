@@ -54,6 +54,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const loadBtn = document.getElementById("load-btn");
   const importStatus = document.getElementById("import-status");
   const closeExportModal = document.getElementById("close-export-modal");
+  const toggleBtn = document.getElementById("toggle-instructions");
+  const content = document.getElementById("instructions-content");
+  const icon = document.getElementById("instructions-icon");
 
   // Элементы модального окна
   const modalOverlay = document.getElementById("modal-overlay");
@@ -1947,6 +1950,18 @@ document.addEventListener("DOMContentLoaded", function () {
   copyBtn.addEventListener("click", copyToClipboard);
   loadBtn.addEventListener("click", importBoard);
   closeExportModal.addEventListener("click", hideExportModal);
+
+  const isCollapsed = localStorage.getItem("instructionsCollapsed") === "true";
+  if (isCollapsed) {
+    content.classList.add("collapsed");
+    icon.textContent = "▲";
+  }
+
+  toggleBtn.addEventListener("click", () => {
+    const isNowCollapsed = content.classList.toggle("collapsed");
+    icon.textContent = isNowCollapsed ? "▲" : "▼";
+    localStorage.setItem("instructionsCollapsed", isNowCollapsed);
+  });
 
   importInput.addEventListener("keypress", function (e) {
     if (e.key === "Enter") {

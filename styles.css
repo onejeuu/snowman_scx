@@ -459,6 +459,38 @@ h1 {
   flex-grow: 1;
 }
 
+.btn-tactic-use {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-tactic-use:hover {
+  background-color: #2980b9;
+}
+
+.tactic-card.active-tactic {
+  border: 2px solid #27ae60 !important;
+  background-color: #f0fff4;
+}
+
+.tactic-card.active-tactic .btn-tactic-use {
+  background-color: #27ae60;
+  color: white;
+}
+
+.tactic-card.active-tactic .btn-tactic-use:hover {
+  background-color: #e74c3c;
+}
+
 .preview-cell {
   aspect-ratio: 1 / 1;
   flex: 1 0 auto;
@@ -1185,7 +1217,9 @@ h1 {
   text-decoration: none;
   font-weight: bold;
   color: white;
-  transition: transform 0.3s, opacity 0.3s;
+  transition:
+    transform 0.3s,
+    opacity 0.3s;
 }
 
 .contact-link.vk {

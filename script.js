@@ -16,6 +16,27 @@ document.addEventListener("DOMContentLoaded", function () {
     { row: 3, col: 4 }, // (4,5)
   ];
 
+  const PRESET_TACTICS = {
+    diamond: [
+      { row: 1, col: 1 },
+      { row: 1, col: 4 },
+      { row: 3, col: 1 },
+      { row: 3, col: 4 },
+    ],
+    cross: [
+      { row: 1, col: 2 },
+      { row: 2, col: 1 },
+      { row: 2, col: 4 },
+      { row: 3, col: 2 },
+    ],
+    diagonal: [
+      { row: 0, col: 2 },
+      { row: 1, col: 4 },
+      { row: 3, col: 1 },
+      { row: 4, col: 3 },
+    ],
+  };
+
   const gameBoardElement = document.getElementById("game-board");
   const goldCountElement = document.getElementById("gold-count");
   const emptyCountElement = document.getElementById("empty-count");
@@ -40,6 +61,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const modalRank = document.getElementById("modal-rank");
   const modalContent = document.getElementById("modal-content");
   const closeModalBtn = document.getElementById("close-modal");
+
+  let selectedTacticId = localStorage.getItem("selectedTactic") || null;
 
   // Состояния клеток
   const CELL_STATES = {
@@ -93,6 +116,18 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
 
+    // Получаем актуальную тактику из памяти
+    selectedTacticId = localStorage.getItem("selectedTactic");
+
+    // Применяем тактику
+    if (selectedTacticId && PRESET_TACTICS[selectedTacticId]) {
+      PRESET_TACTICS[selectedTacticId].forEach((pos) => {
+        gameBoard[pos.row][pos.col].state = CELL_STATES.NORMAL;
+      });
+    }
+
+    //console.log(gameBoard);
+
     // 3. МИНИМАЛЬНЫЙ рендеринг (без анализа процентов)
     renderGameBoardFast();
 
@@ -105,7 +140,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Полный рендеринг с процентами
         renderGameBoardFull();
       },
-      { timeout: 500 }
+      { timeout: 500 },
     );
 
     // Инициализируем предпросмотры тактик
@@ -121,6 +156,9 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
     });
+
+    // Обновляем состояние кнопок (активна/нет)
+    updateTacticButtonsUI();
   }
 
   function renderGameBoardFast() {
@@ -589,8 +627,10 @@ document.addEventListener("DOMContentLoaded", function () {
     let score = neighbors.length * 20; // 20 баллов за каждого соседа
 
     // 2. Положение на поле
-    if (neighbors.length === 4) score += 30; // Центр - максимальный бонус
-    else if (neighbors.length === 3) score += 10; // Край
+    if (neighbors.length === 4)
+      score += 30; // Центр - максимальный бонус
+    else if (neighbors.length === 3)
+      score += 10; // Край
     else if (neighbors.length === 2) score -= 20; // Угол - штраф
 
     // 3. Сколько новых клеток узнаем
@@ -1435,7 +1475,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const isEmpty = emptyCells.some((emptyCell) => emptyCell.row === row && emptyCell.col === col);
 
         const isPossibleGold = possibleGoldCells.some(
-          (goldCell) => goldCell.row === row && goldCell.col === col && goldCell.chance >= 50
+          (goldCell) => goldCell.row === row && goldCell.col === col && goldCell.chance >= 50,
         );
 
         if (cell.state === CELL_STATES.GOLD) {
@@ -1859,6 +1899,43 @@ document.addEventListener("DOMContentLoaded", function () {
       outlineModeBtn.classList.remove("active");
     }
   }
+
+  function updateTacticButtonsUI() {
+    const current = localStorage.getItem("selectedTactic");
+
+    document.querySelectorAll(".btn-tactic-use").forEach((btn) => {
+      const card = btn.closest(".tactic-card");
+      if (!card) return;
+
+      const tacticId = btn.dataset.tacticId;
+
+      if (tacticId === current) {
+        card.classList.add("active-tactic");
+        btn.textContent = "Отменить";
+      } else {
+        card.classList.remove("active-tactic");
+        btn.textContent = "Использовать";
+      }
+    });
+  }
+
+  document.querySelectorAll(".btn-tactic-use").forEach((btn) => {
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const tacticId = this.dataset.tacticId;
+      const current = localStorage.getItem("selectedTactic");
+
+      if (current === tacticId) {
+        localStorage.removeItem("selectedTactic");
+      } else {
+        localStorage.setItem("selectedTactic", tacticId);
+      }
+
+      updateTacticButtonsUI();
+    });
+  });
 
   // Назначение обработчиков событий
   newGameBtn.addEventListener("click", initGameBoard);

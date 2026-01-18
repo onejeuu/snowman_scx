@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Помощник для игры "Снеговик"</title>
     <link rel="stylesheet" href="styles.css" />
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
   </head>
   <body>
     <div class="container">
@@ -36,13 +36,6 @@
           </div>
         </div>
 
-        <!-- Верхняя панель с экспортом/импортом -->
-        <div class="top-controls">
-          <div class="export-import">
-            <button class="btn btn-secondary" id="export-btn" title="Экспорт/Импорт поля">Экспорт / Импорт</button>
-          </div>
-        </div>
-
         <!-- Игровое поле -->
         <div class="game-board" id="game-board"></div>
 
@@ -52,7 +45,8 @@
             <button class="btn btn-primary btn-with-text" id="new-game-btn">Новая игра</button>
           </div>
           <div class="right-controls">
-            <button class="btn btn-outline-mode btn-with-text" id="outline-mode-btn">Золотые контуры</button>
+            <button class="btn btn-secondary" id="export-btn" title="Экспорт/Импорт поля">🛠️</button>
+            <button class="btn btn-outline-mode btn-with-text" id="outline-mode-btn">🔘</button>
             <button class="btn btn-next-move" id="next-move-btn" title="Подсказка хода">💡</button>
           </div>
         </div>
@@ -65,9 +59,9 @@
           <li>
             Нажимайте на клетки, чтобы изменить статус: <strong>Неизвестно → Обычная → Золотая → Неизвестно</strong>
           </li>
-          <li><strong>Кнопка "Золотые контуры":</strong> режим установки/снятия золотых контуров</li>
+          <li><strong>Кнопка "🔘":</strong> режим установки/снятия золотых контуров</li>
           <li><strong>Кнопка "💡":</strong> показывает лучший следующий ход (включается/выключается)</li>
-          <li><strong>Кнопки "📤" и "📥":</strong> экспорт и импорт расстановки поля</li>
+          <li><strong>Кнопки "🛠️":</strong> экспорт и импорт расстановки поля</li>
           <li><strong>Проценты в клетках:</strong> шанс быть золотой ячейкой</li>
           <li><strong>Анализ происходит автоматически</strong> после каждого вашего действия</li>
         </ul>
@@ -106,30 +100,29 @@
         <div class="tactics-grid">
           <div class="tactic-card gold" data-tactic="diamond">
             <h4><span class="rank">1</span> Алмазная формация</h4>
-            <div class="tactic-preview" id="diamond-preview">
-              <!-- Предпросмотр будет создан JavaScript -->
-            </div>
+            <div class="tactic-preview" id="diamond-preview"></div>
             <div class="tactic-description">
               Симметричный ромб в центре поля. Максимальный охват (16 соседей), идеально для триангуляции.
             </div>
+            <button class="btn btn-tactic-use" data-tactic-id="diamond">Использовать</button>
           </div>
+
           <div class="tactic-card silver" data-tactic="cross">
             <h4><span class="rank">2</span> Центральный крест</h4>
-            <div class="tactic-preview" id="cross-preview">
-              <!-- Предпросмотр будет создан JavaScript -->
-            </div>
+            <div class="tactic-preview" id="cross-preview"></div>
             <div class="tactic-description">
               Смещенный крест с фокусом на центральных столбцах. Отлично выявляет вертикальные кластеры золота.
             </div>
+            <button class="btn btn-tactic-use" data-tactic-id="cross">Использовать</button>
           </div>
+
           <div class="tactic-card bronze" data-tactic="diagonal">
             <h4><span class="rank">3</span> Диагональный сканер</h4>
-            <div class="tactic-preview" id="diagonal-preview">
-              <!-- Предпросмотр будет создан JavaScript -->
-            </div>
+            <div class="tactic-preview" id="diagonal-preview"></div>
             <div class="tactic-description">
               Диагональ через всё поле. Эффективен против диагонального расположения золотых ячеек.
             </div>
+            <button class="btn btn-tactic-use" data-tactic-id="diagonal">Использовать</button>
           </div>
         </div>
       </div>
